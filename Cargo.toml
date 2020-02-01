@@ -1,2 +1,5 @@
 [workspace]
-members = ["store", "retrieve"]
+members = [
+    "packages/lambdas/store", 
+    "packages/lambdas/retrieve"
+]
