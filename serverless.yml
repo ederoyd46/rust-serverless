@@ -8,9 +8,15 @@ plugins:
 package:
   individually: true
 functions:
-  test:
-    handler: rust-serverless
+  retrieve:
+    handler: retrieve
     events:
       - http:
-          path: /test
+          path: /retrieve
+          method: GET
+  store:
+    handler: store
+    events:
+      - http:
+          path: /store
           method: GET

@@ -620,7 +620,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "2439c63f3f6139d1b57529d16bc3b8bb855230c8efcc5d3a896c8bea7c3b1e84"
 
 [[package]]
-name = "rust-serverless"
+name = "retrieve"
 version = "0.1.0"
 dependencies = [
  "lambda_runtime",
@@ -734,6 +734,19 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "f7b0758c52e15a8b5e3691eae6cc559f08eee9406e548a4477ba4e67770a82b6"
 dependencies = [
  "maybe-uninit",
+]
+
+[[package]]
+name = "store"
+version = "0.1.0"
+dependencies = [
+ "lambda_runtime",
+ "log",
+ "serde",
+ "serde_derive",
+ "serde_json",
+ "simple-error",
+ "simple_logger",
 ]
 
 [[package]]
