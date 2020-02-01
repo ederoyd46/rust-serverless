@@ -1,0 +1,16 @@
+service: rust-serverless
+provider:
+  name: aws
+  runtime: rust
+  region: eu-central-1
+plugins:
+  - serverless-rust
+package:
+  individually: true
+functions:
+  test:
+    handler: rust-serverless
+    events:
+      - http:
+          path: /test
+          method: GET
