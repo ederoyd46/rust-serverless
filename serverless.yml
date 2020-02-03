@@ -1,22 +1,73 @@
 service: rust-serverless
+
+plugins:
+  - serverless-rust
+  - serverless-pseudo-parameters
+  - serverless-iam-roles-per-function
+  - serverless-stack-output
+
 provider:
   name: aws
   runtime: rust
+  profile: rust
   region: eu-central-1
-plugins:
-  - serverless-rust
+  stage: ${opt:stage, 'dev'}
+  iamRoleStatements:
+    - Effect: Allow
+      Action:
+        - dynamodb:PutItem
+        - dynamodb:UpdateItem
+        - dynamodb:GetItem
+      Resource:
+        - arn:aws:dynamodb:#{AWS::Region}:#{AWS::AccountId}:table/${self:service}-store-${self:provider.stage}
+
 package:
   individually: true
 functions:
   retrieve:
     handler: retrieve
+    memorySize: 256
     events:
       - http:
           path: /retrieve
           method: GET
+    iamRoleStatements:
+      - Effect: Allow
+        Action:
+          - dynamodb:GetItem
+        Resource:
+          - arn:aws:dynamodb:#{AWS::Region}:#{AWS::AccountId}:table/${self:service}-store-${self:provider.stage}
+
   store:
     handler: store
+    memorySize: 512
     events:
       - http:
           path: /store
           method: GET
+    iamRoleStatements:
+      - Effect: Allow
+        Action:
+          - dynamodb:PutItem
+          - dynamodb:UpdateItem
+          - dynamodb:GetItem
+        Resource:
+          - arn:aws:dynamodb:#{AWS::Region}:#{AWS::AccountId}:table/${self:service}-store-${self:provider.stage}
+
+resources:
+  Resources:
+    PaymentInfo:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: ${self:service}-store-${self:provider.stage}
+        AttributeDefinitions:
+          - AttributeName: firstName
+            AttributeType: S
+        KeySchema:
+          - AttributeName: firstName
+            KeyType: HASH
+        BillingMode: PAY_PER_REQUEST
+
+custom:
+  output:
+    file: stack.json
