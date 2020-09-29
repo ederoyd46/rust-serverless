@@ -1,0 +1,6 @@
+zip -j store.zip ./target/release/store
+zip -j retrieve.zip ./target/release/retrieve
+
+sam package --template-file template.yml --s3-bucket matt-sam-deployments --output-template-file ready.yaml
+sam deploy --template-file ready.yaml --stack-name HelloRust --capabilities CAPABILITY_IAM
+
