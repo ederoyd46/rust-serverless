@@ -3,3 +3,7 @@ node_modules
 .serverless
 stack.json
 .DS_Store
+.terraform
+*.zip
+*.tfstate*
+deploy

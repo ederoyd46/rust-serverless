@@ -1,0 +1,83 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Rust Serverless Tests
+Resources:
+  RetrieveFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: Retrieve
+      Handler: does.not.matter
+      Runtime: provided
+      MemorySize: 512
+      CodeUri: s3://matt-sam-deployments/ba65682c815ebd7c21af027000f91f81
+      Events:
+        CatchAll:
+          Type: Api
+          Properties:
+            Path: /retrieve
+            Method: GET
+      Policies:
+      - DynamoDBCrudPolicy:
+          TableName:
+            Fn::GetAtt:
+            - Datastore
+            - Arn
+  StoreFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: Store
+      Handler: does.not.matter
+      Runtime: provided
+      MemorySize: 512
+      CodeUri: s3://matt-sam-deployments/575dda7ab913ff82826b142bfc7d597c
+      Events:
+        CatchAll:
+          Type: Api
+          Properties:
+            Path: /store
+            Method: GET
+      Policies:
+      - DynamoDBCrudPolicy:
+          TableName:
+            Fn::GetAtt:
+            - Datastore
+            - Arn
+  Datastore:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      AttributeDefinitions:
+      - AttributeName: firstName
+        AttributeType: S
+      KeySchema:
+      - AttributeName: firstName
+        KeyType: HASH
+      BillingMode: PAY_PER_REQUEST
+Outputs:
+  HelloAPI:
+    Description: API Gateway endpoint URL for Prod environment for First Function
+    Value:
+      Fn::Sub: https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/hello/
+  RetrieveFunction:
+    Description: Retrieve Lambda Function ARN
+    Value:
+      Fn::GetAtt:
+      - RetrieveFunction
+      - Arn
+  RetrieveFunctionIamRole:
+    Description: Implicit IAM Role created for Retrieve function
+    Value:
+      Fn::GetAtt:
+      - RetrieveFunction
+      - Arn
+  StoreFunction:
+    Description: Store Lambda Function ARN
+    Value:
+      Fn::GetAtt:
+      - StoreFunction
+      - Arn
+  StoreFunctionIamRole:
+    Description: Implicit IAM Role created for Store function
+    Value:
+      Fn::GetAtt:
+      - StoreFunction
+      - Arn
