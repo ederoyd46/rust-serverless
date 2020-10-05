@@ -36,7 +36,7 @@ fn my_handler(e: CustomEvent, c: Context) -> Result<CustomOutput, HandlerError> 
     let item = create_item(&e.first_name);
     let update_item = UpdateItemInput {
         key: item.clone(),
-        table_name: "rust-serverless-store-dev".to_string(),
+        table_name: "rust_serverless_store_dev".to_string(),
         ..Default::default()
     };
 
