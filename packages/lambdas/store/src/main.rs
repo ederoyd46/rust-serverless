@@ -81,13 +81,18 @@ fn create_item(first_name: &String) -> HashMap<String, AttributeValue> {
 
 #[cfg(test)]
 mod tests {
-    use mockall::{automock, mock};
+    use mockall::{mock};
     use lambda_runtime::Context;
     use super::{CustomEvent, CustomOutput};
     use super::env::{set_var};
 
+    mock! {
+        DynamoDbClient {}
+    }
+
     #[test]
     fn test_lambda_handler() {
+        let mut _mock_dynamo_db_client = MockDynamoDbClient::new();
         set_var("DATABASE", "TEST");
 
         let expected_response = CustomOutput {
