@@ -4,7 +4,7 @@ provider "aws" {
 
 # Data Storage
 resource "aws_dynamodb_table" data_store {
-  name = "rust_serverless_store_dev"
+  name = "rust_serverless_store"
   billing_mode = "PAY_PER_REQUEST"
   hash_key = "firstName"
 
@@ -47,7 +47,7 @@ resource aws_lambda_function store {
 
     environment {
       variables = {
-        DATABASE = aws_dynamodb_table.data_store.arn
+        DATABASE = aws_dynamodb_table.data_store.name
       }
     }
 
@@ -67,7 +67,7 @@ resource aws_lambda_function retrieve {
 
     environment {
       variables = {
-        DATABASE = aws_dynamodb_table.data_store.arn
+        DATABASE = aws_dynamodb_table.data_store.name
       }
     }
 
