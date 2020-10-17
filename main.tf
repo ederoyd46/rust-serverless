@@ -57,24 +57,24 @@ resource aws_lambda_function store {
 }
 
 # Retrieve Lambda
-resource aws_lambda_function retrieve {
-    function_name = "Retrieve"
-    handler = "does.not.matter"
-    runtime = "provided"
-    filename = "deploy/retrieve.zip"
-    source_code_hash = filebase64sha256("deploy/retrieve.zip")
-    role = aws_iam_role.base_lambda_role.arn
+# resource aws_lambda_function retrieve {
+#     function_name = "Retrieve"
+#     handler = "does.not.matter"
+#     runtime = "provided"
+#     filename = "deploy/retrieve.zip"
+#     source_code_hash = filebase64sha256("deploy/retrieve.zip")
+#     role = aws_iam_role.base_lambda_role.arn
 
-    environment {
-      variables = {
-        DATABASE = aws_dynamodb_table.data_store.name
-      }
-    }
+#     environment {
+#       variables = {
+#         DATABASE = aws_dynamodb_table.data_store.name
+#       }
+#     }
 
-    lifecycle {
-      ignore_changes = [last_modified]
-    }
-}
+#     lifecycle {
+#       ignore_changes = [last_modified]
+#     }
+# }
 
 
 # Generic Lambda Role

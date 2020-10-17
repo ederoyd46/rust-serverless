@@ -7,3 +7,4 @@ stack.json
 *.zip
 *.tfstate*
 deploy
+out.json
