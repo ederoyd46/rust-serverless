@@ -5,6 +5,9 @@ BASE_DIR=$(shell pwd)
 build: 
 	cargo build 
 
+build_with_lambda: 
+	cargo build --all-features
+
 cross: 
 	cross build --all-features --target=x86_64-unknown-linux-gnu --release
 
@@ -27,12 +30,7 @@ deploy:
 	@terraform apply -auto-approve
 
 test:
-	@aws lambda invoke --function-name Store --invocation-type=RequestResponse --payload $(shell echo '{"firstName": "Test2"}' | base64) out.json | tail
+	@aws lambda invoke --function-name Store --invocation-type=RequestResponse --payload $(shell echo '{"firstName": "Test"}' | base64) out.json | tail
 
 test_local:
-	@DATABASE=rust_serverless_store cargo run -- '{"firstName": "Test2"}'
-# sam-deploy:
-# 	sam package --template-file template.yml --s3-bucket matt-sam-deployments --output-template-file ready.yaml
-# 	sam deploy --template-file ready.yaml --stack-name HelloRust --capabilities CAPABILITY_IAM
-
-
+	@DATABASE=rust_serverless_store cargo run --bin store -- '{"firstName": "Test"}'
