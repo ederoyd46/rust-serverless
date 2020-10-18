@@ -3,27 +3,15 @@ BASE_DIR=$(shell pwd)
 .PHONY: deploy
 
 build: 
-	cargo build 
+	@cargo build 
 
-build_with_lambda: 
-	cargo build --all-features
+release: 
+	@cargo build --all-features --release
 
-all: build build_with_lambda
-
-cross: 
-	cross build --all-features --target=x86_64-unknown-linux-gnu --release
-
-package: cross package_store
-
-package_store:
+package: 
 	@mkdir -p deploy/store
-	@cp target/x86_64-unknown-linux-gnu/release/store deploy/store/bootstrap
-	@zip -j deploy/store.zip deploy/store/bootstrap
-
-package_retrieve:
-	@mkdir -p deploy/retrieve
-	@cp target/x86_64-unknown-linux-gnu/release/retrieve deploy/retrieve/bootstrap
-	@zip -j deploy/retrieve.zip deploy/retrieve/bootstrap
+	@cp target/release/store deploy/store/bootstrap
+	@zip -j -9 deploy/store.zip deploy/store/bootstrap
 
 plan:
 	@terraform plan
@@ -32,6 +20,19 @@ deploy:
 	@terraform apply -auto-approve
 
 test:
+	@cargo test
+
+cross: 
+	cross build --all-features --target=x86_64-unknown-linux-gnu --release
+
+cross_package: 
+	@mkdir -p deploy/store
+	@cp target/x86_64-unknown-linux-gnu/release/store deploy/store/bootstrap
+	@zip -j deploy/store.zip deploy/store/bootstrap
+
+
+
+test_lambda:
 	@aws lambda invoke --function-name Store --invocation-type=RequestResponse --payload $(shell echo '{"firstName": "Test"}' | base64) out.json | tail
 
 test_local:

@@ -11,6 +11,25 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
+    - name: cache dependencies
+      uses: actions/cache@v2
+      with:
+        path: |
+          ~/.cargo/registry
+          ~/.cargo/git
+          target
+        key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+        restore-keys: ${{ runner.os }}-cargo-
+    - uses: actions/checkout@v2
+    - name: build
+      run: make build
+    - name: test
+      run: make test      
+
+  release:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
     - name: Cache Dependencies
       uses: actions/cache@v2
       with:
@@ -21,7 +40,17 @@ jobs:
         key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
         restore-keys: ${{ runner.os }}-cargo-
     - uses: actions/checkout@v2
-    - name: Build for test
-      run: cargo build
-    - name: Run Tests
-      run: cargo test      
+    - name: build
+      run: make release
+    - name: package
+      run: make package
+    - name: upload store lambda
+      uses: actions/upload-artifact@v2
+      with:
+        name: store.zip
+        path: deploy/store/store.zip
+    - name: upload terraform
+      uses: actions/upload-artifact@v2
+      with:
+        name: main.tf
+        path: main.tf
