@@ -20,7 +20,7 @@ static DB_CLIENT: OnceCell<DynamoDbClient> = OnceCell::new();
 #[tokio::main]
 async fn main(event: CustomEvent, _: Context) -> Result<CustomOutput, Error> {
     initialise_logger()?;
-    initialise_client();
+
     handler(event).await
 }
 
@@ -28,7 +28,6 @@ async fn main(event: CustomEvent, _: Context) -> Result<CustomOutput, Error> {
 #[tokio::main]
 async fn main() -> Result<(), Error> {
     initialise_logger()?;
-    initialise_client();
 
     let input_str = std::env::args().nth(1);
     if input_str.is_none() {
@@ -43,14 +42,13 @@ async fn main() -> Result<(), Error> {
 
 async fn handler(event: CustomEvent) -> Result<CustomOutput, Error> {
     let table_name = env::var("DATABASE").unwrap();
+    
     debug!("In the Handler, database table is {}", table_name);
     if event.first_name.is_empty() {
         error!("Empty first name in request");
         panic!("Empty first name");
     }
-    
-    let client = DB_CLIENT.get().unwrap();
-    let item_from_dynamo = store_database_item(table_name, &event, client).await;
+    let item_from_dynamo = store_database_item(table_name, &event, get_db_client()?).await;
 
     info!("item: {:?}", item_from_dynamo);
 
@@ -59,13 +57,14 @@ async fn handler(event: CustomEvent) -> Result<CustomOutput, Error> {
     })
 }
 
-fn initialise_client() {
+fn get_db_client() -> Result<&'static DynamoDbClient, Error> {
     if DB_CLIENT.get().is_none() {
         debug!("About to create a client");
         let client = DynamoDbClient::new(Region::EuCentral1);
         assert_eq!(DB_CLIENT.set(client).is_err(), false);
         debug!("Created a client");    
     }
+    Ok(DB_CLIENT.get().unwrap())
 }
 
 fn initialise_logger() -> Result<(), Error> {

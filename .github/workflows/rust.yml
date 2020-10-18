@@ -1,13 +1,27 @@
 name: Rust
 
-on: [push]
+on: 
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
-
     steps:
+    - name: Cache Dependencies
+      uses: actions/cache@v2
+      with:
+        path: |
+          ~/.cargo/registry
+          ~/.cargo/git
+          target
+        key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+        restore-keys: ${{ runner.os }}-cargo-
     - uses: actions/checkout@v2
-    - name: Build
-      run: cargo build --all-features --verbose --release
+    - name: Build for test
+      run: cargo build
+    - name: Run Tests
+      run: cargo test      

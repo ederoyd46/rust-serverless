@@ -8,6 +8,8 @@ build:
 build_with_lambda: 
 	cargo build --all-features
 
+all: build build_with_lambda
+
 cross: 
 	cross build --all-features --target=x86_64-unknown-linux-gnu --release
 
