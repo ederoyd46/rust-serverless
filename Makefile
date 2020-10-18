@@ -5,6 +5,9 @@ BASE_DIR=$(shell pwd)
 build: 
 	@cargo build 
 
+build_with_features: 
+	@cargo build --all-features
+
 release: 
 	@cargo build --all-features --release
 
@@ -33,7 +36,7 @@ cross_package:
 
 
 test_lambda:
-	@aws lambda invoke --function-name Store --invocation-type=RequestResponse --payload $(shell echo '{"firstName": "Test"}' | base64) out.json | tail
+	@aws lambda invoke --function-name store --invocation-type=RequestResponse --payload $(shell echo '{"firstName": "Test"}' | base64) out.json | tail
 
 test_local:
 	@DATABASE=rust_serverless_store cargo run --bin store -- '{"firstName": "Test"}'

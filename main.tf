@@ -18,9 +18,7 @@ data aws_iam_policy_document data_store_policy_document {
   statement {
     effect = "Allow"
     actions = [
-      "dynamodb:PutItem",
       "dynamodb:UpdateItem",
-      "dynamodb:GetItem"
     ]
 
     resources = [aws_dynamodb_table.data_store.arn]
@@ -33,16 +31,13 @@ resource aws_iam_role_policy data_store_role_policy {
   policy = data.aws_iam_policy_document.data_store_policy_document.json
 }
 
-
-
 # Store Lambda
 resource aws_lambda_function store {
-    function_name = "Store"
+    function_name = "store"
     handler = "does.not.matter"
     runtime = "provided"
     filename = "deploy/store.zip"
     source_code_hash = filebase64sha256("deploy/store.zip")
-    # source_code_hash = data.archive_file.store_zip.output_base64sha256
     role = aws_iam_role.base_lambda_role.arn
 
     environment {
@@ -56,26 +51,10 @@ resource aws_lambda_function store {
     }
 }
 
-# Retrieve Lambda
-# resource aws_lambda_function retrieve {
-#     function_name = "Retrieve"
-#     handler = "does.not.matter"
-#     runtime = "provided"
-#     filename = "deploy/retrieve.zip"
-#     source_code_hash = filebase64sha256("deploy/retrieve.zip")
-#     role = aws_iam_role.base_lambda_role.arn
-
-#     environment {
-#       variables = {
-#         DATABASE = aws_dynamodb_table.data_store.name
-#       }
-#     }
-
-#     lifecycle {
-#       ignore_changes = [last_modified]
-#     }
-# }
-
+resource aws_cloudwatch_log_group store {
+  name              = "/aws/lambda/${aws_lambda_function.store.function_name}"
+  retention_in_days = 3
+}
 
 # Generic Lambda Role
 resource aws_iam_role base_lambda_role {
