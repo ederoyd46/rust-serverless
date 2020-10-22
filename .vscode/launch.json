@@ -1,0 +1,67 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "lldb",
+            "request": "launch",
+            "name": "Debug executable 'store'",
+            "env": {
+                "DATABASE": "rust_serverless_store"
+            },
+            "cargo": {
+                "args": [
+                    "build",
+                    "--bin=store",
+                    "--package=lambdas"
+                ],
+                "filter": {
+                    "name": "store",
+                    "kind": "bin"
+                }
+            },
+            "args": ["{\"firstName\": \"Test\"}"],
+            "cwd": "${workspaceFolder}"
+        },
+        {
+            "type": "lldb",
+            "request": "launch",
+            "name": "Debug unit tests in executable 'store'",
+            "cargo": {
+                "args": [
+                    "test",
+                    "--no-run",
+                    "--bin=store",
+                    "--package=lambdas"
+                ],
+                "filter": {
+                    "name": "store",
+                    "kind": "bin"
+                }
+            },
+            "args": [],
+            "cwd": "${workspaceFolder}"
+        },
+        {
+            "type": "lldb",
+            "request": "launch",
+            "name": "Debug unit tests in library 'lib'",
+            "cargo": {
+                "args": [
+                    "test",
+                    "--no-run",
+                    "--lib",
+                    "--package=lib"
+                ],
+                "filter": {
+                    "name": "lib",
+                    "kind": "lib"
+                }
+            },
+            "args": [],
+            "cwd": "${workspaceFolder}"
+        }
+    ]
+}
