@@ -20,12 +20,12 @@ plan:
 	@terraform plan
 
 deploy:
-	@terraform apply -auto-approve
+	@terraform apply -auto-approve infrastructure
 
 test:
 	@cargo test
 
-cross: 
+cross_build: 
 	cross build --all-features --target=x86_64-unknown-linux-gnu --release
 
 cross_package: 
