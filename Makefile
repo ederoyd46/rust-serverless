@@ -33,8 +33,6 @@ cross_package:
 	@cp target/x86_64-unknown-linux-gnu/release/store deploy/store/bootstrap
 	@zip -j deploy/store.zip deploy/store/bootstrap
 
-
-
 test_lambda:
 	@aws lambda invoke --function-name store --invocation-type=RequestResponse --payload $(shell echo '{"firstName": "Test"}' | base64) out.json | tail
 
