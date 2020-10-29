@@ -1,6 +1,6 @@
 # Store Lambda
 resource aws_lambda_function store {
-    function_name = "store"
+    function_name = "store-${var.stage}"
     handler = "does.not.matter"
     runtime = "provided"
     filename = "deploy/store.zip"

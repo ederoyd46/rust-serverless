@@ -1,4 +1,5 @@
 BASE_DIR=$(shell pwd)
+STAGE=${USER}
 
 .PHONY: deploy
 
@@ -17,10 +18,13 @@ package:
 	@zip -j -9 deploy/store.zip deploy/store/bootstrap
 
 plan:
-	@terraform plan
+	@terraform plan -var stage=$(STAGE) infrastructure
 
 deploy:
-	@terraform apply -auto-approve infrastructure
+	@terraform apply -var stage=$(STAGE) -auto-approve infrastructure
+
+remove:
+	@terraform destroy -var stage=$(STAGE) -auto-approve infrastructure
 
 test:
 	@cargo test
@@ -34,7 +38,7 @@ cross_package:
 	@zip -j deploy/store.zip deploy/store/bootstrap
 
 test_lambda:
-	@aws lambda invoke --function-name store --invocation-type=RequestResponse --payload $(shell echo '{"firstName": "Test"}' | base64) out.json | tail
+	@aws lambda invoke --function-name store-$(STAGE) --invocation-type=RequestResponse --payload $(shell echo '{"firstName": "Test"}' | base64) out.json | tail
 
 test_local:
-	@DATABASE=rust_serverless_store cargo run --bin store -- '{"firstName": "Test"}'
+	@DATABASE=rust_serverless_store-$(STAGE) cargo run --bin store -- '{"firstName": "Test"}'
