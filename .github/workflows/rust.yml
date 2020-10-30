@@ -20,26 +20,11 @@ jobs:
           target
         key: ${{ runner.os }}-cargo-${{ hashFiles('Cargo.lock') }}
         restore-keys: ${{ runner.os }}-cargo-${{ hashFiles('Cargo.lock') }}
-    - name: Build
+    - name: Build Debug
       run: make build
     - name: Test
       run: make test
-
-  release:
-    needs: build
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v2
-    - name: Cache Dependencies
-      uses: actions/cache@v2
-      with:
-        path: |
-          ~/.cargo/registry
-          ~/.cargo/git
-          target
-        key: ${{ runner.os }}-cargo-${{ hashFiles('Cargo.lock') }}
-        restore-keys: ${{ runner.os }}-cargo-${{ hashFiles('Cargo.lock') }}
-    - name: Build
+    - name: Build Release
       run: make release
     - name: Package
       run: make package
@@ -48,8 +33,32 @@ jobs:
       with:
         name: store.zip
         path: deploy/store.zip
-    # - name: Upload Terraform
-    #   uses: actions/upload-artifact@v2
-    #   with:
-    #     name: main.tf
-    #     path: main.tf
+
+  # release:
+  #   needs: build
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #   - uses: actions/checkout@v2
+  #   - name: Cache Dependencies
+  #     uses: actions/cache@v2
+  #     with:
+  #       path: |
+  #         ~/.cargo/registry
+  #         ~/.cargo/git
+  #         target
+  #       key: ${{ runner.os }}-cargo-${{ hashFiles('Cargo.lock') }}
+  #       restore-keys: ${{ runner.os }}-cargo-${{ hashFiles('Cargo.lock') }}
+  #   - name: Build
+  #     run: make release
+  #   - name: Package
+  #     run: make package
+  #   - name: Upload Store Lambda
+  #     uses: actions/upload-artifact@v2
+  #     with:
+  #       name: store.zip
+  #       path: deploy/store.zip
+  #   # - name: Upload Terraform
+  #   #   uses: actions/upload-artifact@v2
+  #   #   with:
+  #   #     name: main.tf
+  #   #     path: main.tf
