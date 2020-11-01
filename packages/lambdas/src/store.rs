@@ -42,7 +42,7 @@ async fn handler(event: CustomEvent) -> Result<CustomOutput, Error> {
         panic!("Empty first name");
     }
     
-    let item_from_dynamo = store_database_item(table_name, &event, get_db_client()?).await;
+    let item_from_dynamo = store_database_item(&table_name, &event, get_db_client()?).await;
 
     info!("item: {:?}", item_from_dynamo);
 

@@ -7,13 +7,13 @@ use std::collections::HashMap;
 use crate::types::CustomEvent;
 
 pub async fn store_database_item(
-    table_name: String,
+    table_name: &str,
     event: &CustomEvent,
     client: &DynamoDbClient,
 ) -> UpdateItemOutput {
     let item = create_item(&event.first_name);
     let update_item = UpdateItemInput {
-        key: item.clone(),
+        key: item,
         table_name: table_name.to_string(),
         ..Default::default()
     };
@@ -31,11 +31,10 @@ pub async fn store_database_item(
     item_from_dynamo
 }
 
-fn create_item(first_name: &String) -> HashMap<String, AttributeValue> {
-    let item_key = "firstName";
+fn create_item(first_name: &str) -> HashMap<String, AttributeValue> {
     let mut item = HashMap::new();
     item.insert(
-        item_key.to_string(),
+        "firstName".to_string(),
         AttributeValue {
             s: Some(first_name.to_string()),
             ..Default::default()

@@ -9,7 +9,7 @@
             "request": "launch",
             "name": "Debug executable 'store'",
             "env": {
-                "DATABASE": "rust_serverless_store"
+                "DATABASE": "rust_serverless_store-${env:USER}"
             },
             "cargo": {
                 "args": [
