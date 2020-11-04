@@ -1,11 +1,11 @@
-mod common;
 
-use common::{get_db_client, initialise_logger};
+use lib::database::{get_db_client, store_database_item};
+use lib::logger::initialise_logger;
+use lib::types::{CustomEvent, CustomOutput, Error};
 
 #[cfg(feature = "with-lambda")]
 use lambda::{lambda, Context};
 
-use lib::{store_database_item, CustomEvent, CustomOutput, Error};
 use log::{debug, error, info};
 
 // use serde_json::Value;

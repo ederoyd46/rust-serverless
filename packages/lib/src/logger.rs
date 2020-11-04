@@ -1,7 +1,7 @@
 use log::{debug, LevelFilter};
 use simple_logger::SimpleLogger;
 
-use lib::Error;
+use crate::types::Error;
 
 use once_cell::sync::OnceCell;
 
