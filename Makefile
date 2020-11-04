@@ -41,12 +41,12 @@ cross_package:
 cross_build_deploy: cross_build cross_package deploy
 
 lambda_test:
-	@aws lambda invoke --function-name store-$(STAGE) --invocation-type=RequestResponse --payload $(shell echo '{"firstName": "Test"}' | base64) out.json | cat
+	@aws lambda invoke --function-name store-$(STAGE) --invocation-type=RequestResponse --payload $(shell echo '{"firstName": "Test", "lastName": "User"}' | base64) out.json | cat
 
 local_test:
 	for i in =1 2 3 4; \
 	do \
-		DATABASE=$(DATA_STORE_NAME) cargo run --bin store -- '{"firstName": "Test '$$i'"}'; \
+		DATABASE=$(DATA_STORE_NAME) cargo run --bin store -- '{"firstName": "Test '$$i'", "lastName": "User"}'; \
 	done;
 local_tables:
 	@aws dynamodb list-tables --endpoint-url http://localhost:8000

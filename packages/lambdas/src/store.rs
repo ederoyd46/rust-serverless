@@ -47,7 +47,7 @@ async fn handler(event: CustomEvent) -> Result<CustomOutput, Error> {
     info!("item: {:?}", item_from_dynamo);
 
     Ok(CustomOutput {
-        message: format!("Hello, {}!", event.first_name),
+        message: format!("Hello, {}!", event.get_name()),
     })
 }
 

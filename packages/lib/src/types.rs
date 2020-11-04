@@ -4,6 +4,15 @@ use serde_derive::{Deserialize, Serialize};
 pub struct CustomEvent {
     #[serde(rename = "firstName")]
     pub first_name: String,
+
+    #[serde(rename = "lastName")]
+    pub last_name: String,
+}
+
+impl CustomEvent {
+    pub fn get_name(self) -> String {
+        format!("{} {}", self.first_name, self.last_name)
+    }
 }
 
 #[derive(Serialize, Debug)]
