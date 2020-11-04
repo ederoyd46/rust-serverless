@@ -8,23 +8,18 @@ use lambda::{lambda, Context};
 
 use log::{debug, error, info};
 
-// use serde_json::Value;
-
 use std::env;
 
 #[cfg(feature = "with-lambda")]
 #[lambda]
 #[tokio::main]
 async fn main(event: CustomEvent, _: Context) -> Result<CustomOutput, Error> {
-    initialise_logger()?;
     handler(event).await
 }
 
 #[cfg(not(feature = "with-lambda"))]
 #[tokio::main]
 async fn main() -> Result<(), Error> {
-    initialise_logger()?;
-
     let input_str = std::env::args().nth(1);
     if input_str.is_none() {
         panic!("You must pass a JSON string input parameter as the first argument");
@@ -37,6 +32,7 @@ async fn main() -> Result<(), Error> {
 }
 
 async fn handler(event: CustomEvent) -> Result<CustomOutput, Error> {
+    initialise_logger()?;
     let table_name = env::var("DATABASE").unwrap();
     debug!("Database table is {}", table_name);
 
