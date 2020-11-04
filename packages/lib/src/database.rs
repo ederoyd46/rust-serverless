@@ -1,5 +1,5 @@
 mod client;
 mod store;
 
-pub use store::*;
 pub use client::*;
+pub use store::*;

@@ -1,6 +1,5 @@
-
 use rusoto_dynamodb::AttributeValue;
-use serde_derive::{Deserialize};
+use serde_derive::Deserialize;
 use std::collections::HashMap;
 
 use super::Storable;

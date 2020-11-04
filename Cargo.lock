@@ -664,8 +664,6 @@ dependencies = [
  "lib",
  "log",
  "mockall",
- "serde",
- "serde_derive",
  "serde_json",
  "tokio",
 ]

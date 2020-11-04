@@ -1,4 +1,3 @@
-
 use lib::database::{get_db_client, store_database_item};
 use lib::logger::initialise_logger;
 use lib::types::{CustomEvent, CustomOutput, Error};
