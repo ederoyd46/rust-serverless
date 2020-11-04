@@ -7,6 +7,9 @@ use lambda::{lambda, Context};
 
 use lib::{store_database_item, CustomEvent, CustomOutput, Error};
 use log::{debug, error, info};
+
+// use serde_json::Value;
+
 use std::env;
 
 #[cfg(feature = "with-lambda")]
@@ -27,7 +30,7 @@ async fn main() -> Result<(), Error> {
         panic!("You must pass a JSON string input parameter as the first argument");
     }
 
-    let input = serde_json::from_str(&input_str.unwrap())?;
+    let input: CustomEvent = serde_json::from_str(&input_str.unwrap())?;
     let output = handler(input).await?;
     println!("{}", serde_json::to_string(&output)?);
     Ok(())
@@ -36,12 +39,12 @@ async fn main() -> Result<(), Error> {
 async fn handler(event: CustomEvent) -> Result<CustomOutput, Error> {
     let table_name = env::var("DATABASE").unwrap();
     debug!("Database table is {}", table_name);
-    
+
     if event.first_name.is_empty() {
         error!("Empty first name in request");
         panic!("Empty first name");
     }
-    
+
     let item_from_dynamo = store_database_item(&table_name, &event, get_db_client()?).await;
 
     info!("item: {:?}", item_from_dynamo);

@@ -1,0 +1,12 @@
+version: "3"
+
+services:
+  "dynamodb":
+    image: amazon/dynamodb-local:1.13.5
+    networks:
+      - dynamodb
+    ports:
+      - 8000:8000
+
+networks:
+  dynamodb:

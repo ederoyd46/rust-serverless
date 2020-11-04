@@ -42,7 +42,7 @@ data aws_iam_policy_document data_store_policy_document {
   statement {
     effect = "Allow"
     actions = [
-      "dynamodb:UpdateItem",
+      "dynamodb:PutItem",
     ]
 
     resources = [aws_dynamodb_table.data_store.arn]

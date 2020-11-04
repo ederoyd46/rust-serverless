@@ -1,25 +1,22 @@
 use log::{self, debug, error};
-use rusoto_dynamodb::{
-    AttributeValue, DynamoDb, DynamoDbClient, UpdateItemInput, UpdateItemOutput,
-};
-use std::collections::HashMap;
+use rusoto_dynamodb::{DynamoDb, DynamoDbClient, PutItemInput, PutItemOutput};
+// use serde_json::Value;
 
-use crate::types::CustomEvent;
+use crate::types::{CustomEvent, Storable};
 
 pub async fn store_database_item(
     table_name: &str,
     event: &CustomEvent,
     client: &DynamoDbClient,
-) -> UpdateItemOutput {
-    let item = create_item(&event.first_name);
-    let update_item = UpdateItemInput {
-        key: item,
+) -> PutItemOutput {
+    let put_item = PutItemInput {
+        item: event.to_dynamo_db(),
         table_name: table_name.to_string(),
         ..Default::default()
     };
 
     debug!("About to update DynamoDB");
-    let item_from_dynamo = match client.update_item(update_item).await {
+    let item_from_dynamo = match client.put_item(put_item).await {
         Ok(item) => item,
         Err(e) => {
             error!("Error completing write to database: {}", e);
@@ -29,16 +26,4 @@ pub async fn store_database_item(
     debug!("Updated DynamoDB");
 
     item_from_dynamo
-}
-
-fn create_item(first_name: &str) -> HashMap<String, AttributeValue> {
-    let mut item = HashMap::new();
-    item.insert(
-        "firstName".to_string(),
-        AttributeValue {
-            s: Some(first_name.to_string()),
-            ..Default::default()
-        },
-    );
-    item
 }

@@ -49,7 +49,7 @@ local_test:
 		DATABASE=$(DATA_STORE_NAME) cargo run --bin store -- '{"firstName": "Test '$$i'", "lastName": "User"}'; \
 	done;
 local_tables:
-	@aws dynamodb list-tables --endpoint-url http://localhost:8000
+	@aws dynamodb list-tables --endpoint-url http://localhost:8000 | cat
 
 local_table_scan:
 	@aws dynamodb scan --table-name $(DATA_STORE_NAME) --endpoint-url http://localhost:8000 | cat
@@ -61,7 +61,8 @@ local_table_create:
 		--key-schema \
 			AttributeName=firstName,KeyType=HASH \
 		--billing-mode PAY_PER_REQUEST \
-		--endpoint-url http://localhost:8000
+		--endpoint-url http://localhost:8000 \
+	| cat
             
 
 
