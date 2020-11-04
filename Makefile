@@ -44,7 +44,7 @@ lambda_test:
 	@aws lambda invoke --function-name store-$(STAGE) --invocation-type=RequestResponse --payload $(shell echo '{"firstName": "Test", "lastName": "User"}' | base64) out.json | cat
 
 local_test:
-	for i in =1 2 3 4; \
+	@for i in =1 2 3 4; \
 	do \
 		DATABASE=$(DATA_STORE_NAME) cargo run --bin store -- '{"firstName": "Test '$$i'", "lastName": "User"}'; \
 	done;

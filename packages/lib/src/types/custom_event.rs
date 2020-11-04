@@ -3,9 +3,7 @@ use rusoto_dynamodb::AttributeValue;
 use serde_derive::{Deserialize};
 use std::collections::HashMap;
 
-pub trait Storable {
-    fn to_dynamo_db(&self) -> HashMap<String, AttributeValue>;
-}
+use super::Storable;
 
 #[derive(Deserialize, Debug)]
 pub struct CustomEvent {
