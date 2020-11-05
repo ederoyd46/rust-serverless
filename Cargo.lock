@@ -682,7 +682,6 @@ dependencies = [
  "once_cell",
  "rusoto_core",
  "rusoto_dynamodb",
- "rusoto_s3",
  "serde",
  "serde_derive",
  "serde_json",
@@ -1120,19 +1119,6 @@ dependencies = [
  "rusoto_core",
  "serde",
  "serde_json",
-]
-
-[[package]]
-name = "rusoto_s3"
-version = "0.45.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "1146e37a7c1df56471ea67825fe09bbbd37984b5f6e201d8b2e0be4ee15643d8"
-dependencies = [
- "async-trait",
- "bytes",
- "futures",
- "rusoto_core",
- "xml-rs",
 ]
 
 [[package]]
