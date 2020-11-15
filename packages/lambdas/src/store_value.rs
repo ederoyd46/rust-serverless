@@ -1,6 +1,6 @@
 use lib::database::{get_db_client, store_database_item};
 use lib::logger::initialise_logger;
-use lib::types::{CustomEvent, CustomOutput, Error};
+use lib::types::{CustomValue, CustomOutput, Error};
 
 #[cfg(feature = "with-lambda")]
 use lambda::{lambda, Context};
@@ -12,7 +12,7 @@ use std::env;
 #[cfg(feature = "with-lambda")]
 #[lambda]
 #[tokio::main]
-async fn main(event: CustomEvent, _: Context) -> Result<CustomOutput, Error> {
+async fn main(event: Value, _: Context) -> Result<CustomOutput, Error> {
     handler(event).await
 }
 
@@ -24,20 +24,20 @@ async fn main() -> Result<(), Error> {
         panic!("You must pass a JSON string input parameter as the first argument");
     }
 
-    let input: CustomEvent = serde_json::from_str(&input_str.unwrap())?;
+    let input: CustomValue = serde_json::from_str(&input_str.unwrap())?;
     let output = handler(input).await?;
     println!("{}", serde_json::to_string(&output)?);
     Ok(())
 }
 
-async fn handler(event: CustomEvent) -> Result<CustomOutput, Error> {
+async fn handler(event: CustomValue) -> Result<CustomOutput, Error> {
     initialise_logger()?;
     let table_name = env::var("DATABASE").unwrap();
     debug!("Database table is {}", table_name);
 
-    if event.first_name.is_empty() {
-        error!("Empty first name in request");
-        panic!("Empty first name");
+    if event.key().is_empty() {
+        error!("No key specified");
+        panic!("No key specified");
     }
 
     let item_from_dynamo = store_database_item(&table_name, &event, get_db_client()?).await;
@@ -45,6 +45,6 @@ async fn handler(event: CustomEvent) -> Result<CustomOutput, Error> {
     info!("item: {:?}", item_from_dynamo);
 
     Ok(CustomOutput {
-        message: format!("Hello, {}!", event.get_name()),
+        message: format!("Stored, {}!", event.key()),
     })
 }

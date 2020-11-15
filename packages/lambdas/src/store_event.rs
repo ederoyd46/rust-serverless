@@ -35,7 +35,7 @@ async fn handler(event: CustomEvent) -> Result<CustomOutput, Error> {
     let table_name = env::var("DATABASE").unwrap();
     debug!("Database table is {}", table_name);
 
-    if event.first_name.is_empty() {
+    if !event.is_valid() {
         error!("Empty first name in request");
         panic!("Empty first name");
     }
@@ -45,7 +45,7 @@ async fn handler(event: CustomEvent) -> Result<CustomOutput, Error> {
     info!("item: {:?}", item_from_dynamo);
 
     Ok(CustomOutput {
-        message: format!("Hello, {}!", event.get_name()),
+        message: format!("Hello, {}!", event.name()),
     })
 }
 

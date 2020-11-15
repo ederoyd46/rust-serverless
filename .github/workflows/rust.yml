@@ -26,7 +26,7 @@ jobs:
       run: make release
     - name: Package
       run: make package
-    - name: Upload Store Lambda
+    - name: Upload Lambdas
       uses: actions/upload-artifact@v2
       with:
         name: lambdas-${{ runner.os }}.zip

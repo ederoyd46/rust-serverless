@@ -2,10 +2,10 @@
 resource aws_dynamodb_table data_store {
   name = "rust_serverless_store-${var.stage}"
   billing_mode = "PAY_PER_REQUEST"
-  hash_key = "firstName"
+  hash_key = "PK"
 
   attribute {
-    name = "firstName"
+    name = "PK"
     type = "S"
   }
 }

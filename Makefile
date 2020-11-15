@@ -45,15 +45,24 @@ cross.package:
 		zip -j -9 deploy/$$i.zip deploy/$$i/bootstrap; \
 	done;
 
-cross.build.deploy: cross_build cross_package deploy
+cross.build.deploy: cross.build cross.package deploy
 
-test.lambda:
+test.lambda.event:
 	@aws lambda invoke --function-name store_event-$(STAGE) --invocation-type=RequestResponse --payload $(shell echo '{"firstName": "Test", "lastName": "User"}' | base64) out.json | cat
 
-test.local:
-	@for i in 1 2 3 4; \
+test.lambda.value:
+	@aws lambda invoke --function-name store_value-$(STAGE) --invocation-type=RequestResponse --payload $(shell echo '{"key": "Test", "value": {"subKey": "Sub Value"}}' | base64) out.json | cat
+
+test.local.event:
+	@for i in 1; \
 	do \
 		DATABASE=$(DATA_STORE_NAME) cargo run --bin store_event -- '{"firstName": "Test '$$i'", "lastName": "User"}'; \
+	done;
+
+test.local.value:
+	@for i in 1; \
+	do \
+		DATABASE=$(DATA_STORE_NAME) cargo run --bin store_value -- '{"key": "Key '$$i'", "value": {"subKey": "Sub Value '$$i'"}}'; \
 	done;
 
 
@@ -66,9 +75,9 @@ table.scan:
 table.create:
 	@aws dynamodb create-table --table-name $(DATA_STORE_NAME) \
 		--attribute-definitions \
-			AttributeName=firstName,AttributeType=S \
+			AttributeName=PK,AttributeType=S \
 		--key-schema \
-			AttributeName=firstName,KeyType=HASH \
+			AttributeName=PK,KeyType=HASH \
 		--billing-mode PAY_PER_REQUEST \
 		$(ENDPOINT) \
 	| cat
