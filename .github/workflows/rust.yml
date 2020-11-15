@@ -20,8 +20,6 @@ jobs:
           target
         key: ${{ runner.os }}-cargo-${{ hashFiles('Cargo.lock') }}
         restore-keys: ${{ runner.os }}-cargo-${{ hashFiles('Cargo.lock') }}
-    - name: Build Debug
-      run: make build
     - name: Test
       run: make test
     - name: Build Release
@@ -31,7 +29,7 @@ jobs:
     - name: Upload Store Lambda
       uses: actions/upload-artifact@v2
       with:
-        name: lambdas
+        name: lambdas-${{ runner.os }}.zip
         path: |
           deploy/*.zip
 
