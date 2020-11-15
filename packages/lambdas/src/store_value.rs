@@ -1,6 +1,6 @@
 use lib::database::{get_db_client, store_database_item};
 use lib::logger::initialise_logger;
-use lib::types::{CustomValue, CustomOutput, Error};
+use lib::types::{CustomOutput, Error, Storable, CustomValue};
 
 #[cfg(feature = "with-lambda")]
 use lambda::{lambda, Context};
@@ -30,12 +30,12 @@ async fn main() -> Result<(), Error> {
     Ok(())
 }
 
-async fn handler(event: CustomValue) -> Result<CustomOutput, Error> {
+async fn handler<T: Storable>(event: T) -> Result<CustomOutput, Error> {
     initialise_logger()?;
     let table_name = env::var("DATABASE").unwrap();
     debug!("Database table is {}", table_name);
 
-    if event.key().is_empty() {
+    if !event.is_valid() {
         error!("No key specified");
         panic!("No key specified");
     }
@@ -45,6 +45,6 @@ async fn handler(event: CustomValue) -> Result<CustomOutput, Error> {
     info!("item: {:?}", item_from_dynamo);
 
     Ok(CustomOutput {
-        message: format!("Stored, {}!", event.key()),
+        message: format!("Stored, {}!", event.get_pk()),
     })
 }

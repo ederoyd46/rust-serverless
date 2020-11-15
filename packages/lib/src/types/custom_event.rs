@@ -4,7 +4,7 @@ use std::collections::HashMap;
 
 use super::Storable;
 
-#[derive(Deserialize, Debug)]
+#[derive(Clone, Eq, PartialEq, Deserialize, Debug)]
 pub struct CustomEvent {
     #[serde(rename = "firstName")]
     first_name: String,
@@ -21,17 +21,17 @@ impl CustomEvent {
             format!("{}", self.first_name)
         }
     }
+}
 
-    pub fn is_valid(&self) -> bool {
+impl Storable for CustomEvent {
+    fn is_valid(&self) -> bool {
         if self.first_name.is_empty() {
             false
         } else {
             true
         }
     }
-}
 
-impl Storable for CustomEvent {
     fn get_pk(&self) -> String {
         self.name()
     }

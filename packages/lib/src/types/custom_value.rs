@@ -5,7 +5,7 @@ use std::collections::HashMap;
 
 use super::Storable;
 
-#[derive(Deserialize, Debug)]
+#[derive(Clone, Eq, PartialEq, Deserialize, Debug)]
 pub struct CustomValue {
     #[serde(rename = "key")]
     key: String,
@@ -24,6 +24,14 @@ impl CustomValue {
 }
 
 impl Storable for CustomValue {
+    fn is_valid(&self) -> bool {
+        if self.key().is_empty() {
+            false
+        } else {
+            true
+        }
+    }
+
     fn get_pk(&self) -> String {
         self.key().to_string()
     }
