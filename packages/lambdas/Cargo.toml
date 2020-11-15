@@ -19,8 +19,12 @@ with-lambda = []
 # default = ["with-lambda"]
 
 [[bin]]
-name = "store"
-path = "src/store.rs"
+name = "store_event"
+path = "src/store_event.rs"
+
+[[bin]]
+name = "store_value"
+path = "src/store_value.rs"
 
 # [[bin]]
 # name = "retrieve"

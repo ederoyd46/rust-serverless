@@ -5,11 +5,11 @@ use crate::types::{Storable};
 
 pub async fn store_database_item(
     table_name: &str,
-    event: &dyn Storable,
+    data: &dyn Storable,
     client: &DynamoDbClient,
 ) -> PutItemOutput {
     let put_item = PutItemInput {
-        item: event.to_dynamo_db(),
+        item: data.to_dynamo_db(),
         table_name: table_name.to_string(),
         ..Default::default()
     };

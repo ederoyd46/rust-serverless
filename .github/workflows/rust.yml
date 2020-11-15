@@ -31,8 +31,9 @@ jobs:
     - name: Upload Store Lambda
       uses: actions/upload-artifact@v2
       with:
-        name: store.zip
-        path: deploy/store.zip
+        name: lambdas
+        path: |
+          deploy/*.zip
 
   # release:
   #   needs: build
