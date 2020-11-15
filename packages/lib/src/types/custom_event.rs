@@ -38,13 +38,6 @@ impl Storable for CustomEvent {
 
     fn to_dynamo_db(&self) -> HashMap<String, AttributeValue> {
         let mut item = HashMap::new();
-        item.insert(
-            "PK".to_string(),
-            AttributeValue {
-                s: Some(self.get_pk().to_string()),
-                ..Default::default()
-            },
-        );
 
         item.insert(
             "firstName".to_string(),

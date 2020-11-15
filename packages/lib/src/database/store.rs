@@ -1,5 +1,7 @@
 use log::{self, debug, error};
 use rusoto_dynamodb::{DynamoDb, DynamoDbClient, PutItemInput, PutItemOutput};
+use std::collections::HashMap;
+use rusoto_dynamodb::AttributeValue;
 
 use crate::types::{Storable};
 
@@ -9,7 +11,7 @@ pub async fn store_database_item(
     client: &DynamoDbClient,
 ) -> PutItemOutput {
     let put_item = PutItemInput {
-        item: data.to_dynamo_db(),
+        item: build_dynamo_db_map(data),
         table_name: table_name.to_string(),
         ..Default::default()
     };
@@ -25,4 +27,19 @@ pub async fn store_database_item(
     debug!("Updated DynamoDB");
 
     item_from_dynamo
+}
+
+fn build_dynamo_db_map(data: &dyn Storable) -> HashMap<String, AttributeValue> {
+    let mut item = HashMap::new();
+    item.insert(
+        "PK".to_string(),
+        AttributeValue {
+            s: Some(data.get_pk()),
+            ..Default::default()
+        },
+    );
+
+    item.extend(data.to_dynamo_db());
+
+    item
 }

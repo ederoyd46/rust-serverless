@@ -12,7 +12,7 @@ use std::env;
 #[cfg(feature = "with-lambda")]
 #[lambda]
 #[tokio::main]
-async fn main(event: Value, _: Context) -> Result<CustomOutput, Error> {
+async fn main(event: CustomValue, _: Context) -> Result<CustomOutput, Error> {
     handler(event).await
 }
 

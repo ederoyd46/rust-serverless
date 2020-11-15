@@ -1,7 +1,7 @@
 use rusoto_dynamodb::AttributeValue;
 use serde_derive::Deserialize;
-use std::collections::HashMap;
 use serde_json::Value;
+use std::collections::HashMap;
 
 use super::Storable;
 
@@ -18,7 +18,6 @@ impl CustomValue {
     pub fn key(&self) -> &String {
         &self.key
     }
-    
     pub fn value(&self) -> &Value {
         &self.value
     }
@@ -31,13 +30,7 @@ impl Storable for CustomValue {
 
     fn to_dynamo_db(&self) -> HashMap<String, AttributeValue> {
         let mut item = HashMap::new();
-        item.insert(
-            "PK".to_string(),
-            AttributeValue {
-                s: Some(self.key().to_string()),
-                ..Default::default()
-            },
-        );
+
         item.insert(
             "value".to_string(),
             AttributeValue {
@@ -45,6 +38,7 @@ impl Storable for CustomValue {
                 ..Default::default()
             },
         );
+
         item
     }
 }
