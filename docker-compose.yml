@@ -7,6 +7,13 @@ services:
       - dynamodb
     ports:
       - 8000:8000
+    user: root:root
+    command: -jar DynamoDBLocal.jar -dbPath /var/db
+    volumes:
+      - data:/var/db:rw
 
 networks:
   dynamodb:
+
+volumes:
+  data: 
