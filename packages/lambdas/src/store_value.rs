@@ -9,6 +9,7 @@ use log::{debug, error, info};
 
 use std::env;
 
+
 #[cfg(feature = "with-lambda")]
 #[lambda]
 #[tokio::main]
@@ -24,9 +25,15 @@ async fn main() -> Result<(), Error> {
         panic!("You must pass a JSON string input parameter as the first argument");
     }
 
-    let input: CustomValue = serde_json::from_str(&input_str.unwrap())?;
+    let input: CustomValue = match serde_json::from_str(&input_str.unwrap()) {
+        Ok(item) => item,
+        Err(e) => {
+            error!("Could not parse input to known type {}", e);
+            panic!("Could not parse input to known type {}", e)
+        }
+    };
     let output = handler(input).await?;
-    println!("{}", serde_json::to_string(&output)?);
+    debug!("{}", serde_json::to_string(&output)?);
     Ok(())
 }
 

@@ -5,7 +5,7 @@ use std::collections::HashMap;
 
 use super::Storable;
 
-#[derive(Clone, Eq, PartialEq, Deserialize, Debug)]
+#[derive(Deserialize, Debug)]
 pub struct CustomValue {
     #[serde(rename = "key")]
     key: String,
@@ -38,7 +38,7 @@ impl Storable for CustomValue {
 
     fn to_dynamo_db(&self) -> HashMap<String, AttributeValue> {
         let mut item = HashMap::new();
-
+        self.value();
         item.insert(
             "value".to_string(),
             AttributeValue {

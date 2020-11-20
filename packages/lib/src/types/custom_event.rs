@@ -4,7 +4,7 @@ use std::collections::HashMap;
 
 use super::Storable;
 
-#[derive(Clone, Eq, PartialEq, Deserialize, Debug)]
+#[derive(Deserialize, Debug)]
 pub struct CustomEvent {
     #[serde(rename = "firstName")]
     first_name: String,
