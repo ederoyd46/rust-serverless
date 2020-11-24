@@ -21,6 +21,7 @@ async fn main(event: CustomValue, _: Context) -> Result<CustomOutput, Error> {
 #[tokio::main]
 async fn main() -> Result<(), Error> {
     let input_str = std::env::args().nth(1);
+
     if input_str.is_none() {
         panic!("You must pass a JSON string input parameter as the first argument");
     }
@@ -32,6 +33,7 @@ async fn main() -> Result<(), Error> {
             panic!("Could not parse input to known type {}", e)
         }
     };
+
     let output = handler(input).await?;
     debug!("{}", serde_json::to_string(&output)?);
     Ok(())
