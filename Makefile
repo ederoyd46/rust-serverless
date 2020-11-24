@@ -62,9 +62,12 @@ test.local.event:
 test.local.value:
 	@for i in 1; \
 	do \
-		DATABASE=$(DATA_STORE_NAME) cargo run --bin store_value -- '{"key": "Key '$$i'", "value": {"subKey": "Sub Value '$$i'"}}'; \
+		DATABASE=$(DATA_STORE_NAME) cargo run --bin store_value -- '{"key": "Key Object '$$i'", "value": {"valString": "Sub Value '$$i'", "valNumber": 1, "valBool": true, "valObj": {"valString":"Sub Value 1+ '$$i'"}}}'; \
 	done;
 
+	# DATABASE=$(DATA_STORE_NAME) cargo run --bin store_value -- '{"key": "Key Bool '$$i'", "value": true}'; \
+	# DATABASE=$(DATA_STORE_NAME) cargo run --bin store_value -- '{"key": "Key Number '$$i'", "value": 1}'; \
+	# DATABASE=$(DATA_STORE_NAME) cargo run --bin store_value -- '{"key": "Key String '$$i'", "value": "Value '$$i'"}'; \
 
 table.list:
 	@aws dynamodb list-tables $(ENDPOINT) | cat
@@ -82,5 +85,3 @@ table.create:
 		$(ENDPOINT) \
 	| cat
             
-
-

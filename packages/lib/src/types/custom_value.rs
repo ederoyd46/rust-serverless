@@ -1,6 +1,6 @@
 use rusoto_dynamodb::AttributeValue;
 use serde_derive::Deserialize;
-use serde_json::Value;
+use serde_json::{Map, Value};
 use std::collections::HashMap;
 
 use super::Storable;
@@ -38,15 +38,41 @@ impl Storable for CustomValue {
 
     fn to_dynamo_db(&self) -> HashMap<String, AttributeValue> {
         let mut item = HashMap::new();
-        self.value();
-        item.insert(
-            "value".to_string(),
-            AttributeValue {
-                s: Some(self.value().to_string()),
-                ..Default::default()
-            },
-        );
 
+        item.insert("value".to_string(), build_attribute_value(self.value()));
         item
     }
+}
+
+
+fn build_attribute_value(value: &Value) -> AttributeValue {
+    match value {
+        Value::String(val) => AttributeValue {
+            s: Some(val.to_string()),
+            ..Default::default()
+        },
+        Value::Number(val) => AttributeValue {
+            n: Some(val.to_string()),
+            ..Default::default()
+        },
+        Value::Bool(val) => AttributeValue {
+            bool: Some(*val),
+            ..Default::default()
+        },
+        Value::Object(val) => AttributeValue {
+            m: Some(build_dynamodb_object(val.clone())),
+            ..Default::default()
+        },
+        _ => panic!("not yet supported"),
+    }
+}
+
+fn build_dynamodb_object(object: Map<String, Value>) -> HashMap<String, AttributeValue> {
+    let mut items = HashMap::new();
+
+    for (k, v) in object.iter() {
+        items.insert(k.to_string(), build_attribute_value(v));
+    }
+
+    items
 }
