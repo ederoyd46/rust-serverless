@@ -1,6 +1,6 @@
 use lib::database::{get_db_client, store_database_item};
 use lib::logger::initialise_logger;
-use lib::types::{CustomOutput, Error, Storable, CustomValue};
+use lib::types::{CustomOutput, CustomValue, Error, Storable};
 
 #[cfg(feature = "with-lambda")]
 use lambda::{lambda, Context};
@@ -8,7 +8,6 @@ use lambda::{lambda, Context};
 use log::{debug, error, info};
 
 use std::env;
-
 
 #[cfg(feature = "with-lambda")]
 #[lambda]

@@ -25,11 +25,7 @@ impl CustomValue {
 
 impl Storable for CustomValue {
     fn is_valid(&self) -> bool {
-        if self.key().is_empty() {
-            false
-        } else {
-            true
-        }
+        !self.key().is_empty()
     }
 
     fn get_pk(&self) -> String {
@@ -43,7 +39,6 @@ impl Storable for CustomValue {
         item
     }
 }
-
 
 fn build_attribute_value(value: &Value) -> AttributeValue {
     match value {

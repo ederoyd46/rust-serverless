@@ -18,18 +18,14 @@ impl CustomEvent {
         if self.last_name.is_some() {
             format!("{} {}", self.first_name, self.last_name.as_ref().unwrap())
         } else {
-            format!("{}", self.first_name)
+            self.first_name.to_string()
         }
     }
 }
 
 impl Storable for CustomEvent {
     fn is_valid(&self) -> bool {
-        if self.first_name.is_empty() {
-            false
-        } else {
-            true
-        }
+        !self.first_name.is_empty()
     }
 
     fn get_pk(&self) -> String {
