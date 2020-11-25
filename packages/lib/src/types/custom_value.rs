@@ -58,7 +58,14 @@ fn build_attribute_value(value: &Value) -> AttributeValue {
             m: Some(build_dynamodb_object(val.clone())),
             ..Default::default()
         },
-        _ => panic!("not yet supported"),
+        Value::Array(val) => AttributeValue {
+            l: Some(build_dynamodb_array(val.clone())),
+            ..Default::default()
+        },
+        Value::Null => AttributeValue {
+            l: None,
+            ..Default::default()
+        },
     }
 }
 
@@ -67,6 +74,16 @@ fn build_dynamodb_object(object: Map<String, Value>) -> HashMap<String, Attribut
 
     for (k, v) in object.iter() {
         items.insert(k.to_string(), build_attribute_value(v));
+    }
+
+    items
+}
+
+fn build_dynamodb_array(object: Vec<Value>) -> Vec<AttributeValue> {
+    let mut items = vec!();
+
+    for v in object.iter() {
+        items.push(build_attribute_value(v))
     }
 
     items
