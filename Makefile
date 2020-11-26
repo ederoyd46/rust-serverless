@@ -35,7 +35,7 @@ test:
 	@cargo test
 
 cross.build: 
-	cross build --all-features --target=x86_64-unknown-linux-gnu --release
+	cross build --all-features --jobs 2 --target=x86_64-unknown-linux-gnu --release
 
 cross.package: 
 	@for i in store_event store_value; \
@@ -51,7 +51,7 @@ test.lambda.event:
 	@aws lambda invoke --function-name store_event-$(STAGE) --invocation-type=RequestResponse --payload $(shell echo '{"firstName": "Test", "lastName": "User"}' | base64) out.json | cat
 
 test.lambda.value:
-	@aws lambda invoke --function-name store_value-$(STAGE) --invocation-type=RequestResponse --payload $(shell echo '{"key": "Test", "value": {"subKey": "Sub Value"}}' | base64) out.json | cat
+	@aws lambda invoke --function-name store_value-$(STAGE) --invocation-type=RequestResponse --payload $(shell echo '{ "key": "Key Object", "value": { "valString": "Sub Value 1", "valNumber": 1, "valBool": true, "valObj": { "valString": "Sub Value 2" }, "valArray": [ { "valArray": ["Sub Array 1", "Sub Array 2"] }, "some array string", 1, true ] }}'| base64) out.json | cat
 
 test.local.event:
 	@for i in 1; \
@@ -62,13 +62,12 @@ test.local.event:
 test.local.value:
 	@for i in 1; \
 	do \
-		DATABASE=$(DATA_STORE_NAME) cargo run --bin store_value -- '{ "key": "Key Object", "value": { "valString": "Sub Value 1", "valNumber": 1, "valBool": true, "valObj": { "valString": "Sub Value 2" }, "valArray": [ { "valArray": ["Sub Array 1", "Sub Array 2"] }, "some array string", 1, true ] }}'; \
+		DATABASE=$(DATA_STORE_NAME) cargo run --bin store_value -- '{"key": "Key Object '$$i'", "value": { "valString": "Sub Value 1", "valNumber": 1, "valBool": true, "valObj": { "valString": "Sub Value 2" }, "valArray": [ { "valArray": ["Sub Array 1", "Sub Array 2"] }, "some array string", 1, true ] }}'; \
+		DATABASE=$(DATA_STORE_NAME) cargo run --bin store_value -- '{"key": "Key Array '$$i'", "value": ["val 1","val 2"]}'; \
+		DATABASE=$(DATA_STORE_NAME) cargo run --bin store_value -- '{"key": "Key Bool '$$i'", "value": true}'; \
+		DATABASE=$(DATA_STORE_NAME) cargo run --bin store_value -- '{"key": "Key Number '$$i'", "value": 1}'; \
+		DATABASE=$(DATA_STORE_NAME) cargo run --bin store_value -- '{"key": "Key String '$$i'", "value": "Value"}'; \
 	done;
-
-	# DATABASE=$(DATA_STORE_NAME) cargo run --bin store_value -- '{"key": "Key Object '$$i'", "value": {"valString": "Sub Value '$$i'", "valNumber": 1, "valBool": true, "valObj": {"valString":"Sub Value 1+ '$$i'"}}}'; \
-	# DATABASE=$(DATA_STORE_NAME) cargo run --bin store_value -- '{"key": "Key Bool '$$i'", "value": true}'; \
-	# DATABASE=$(DATA_STORE_NAME) cargo run --bin store_value -- '{"key": "Key Number '$$i'", "value": 1}'; \
-	# DATABASE=$(DATA_STORE_NAME) cargo run --bin store_value -- '{"key": "Key String '$$i'", "value": "Value '$$i'"}'; \
 
 table.list:
 	@aws dynamodb list-tables $(ENDPOINT) | cat
