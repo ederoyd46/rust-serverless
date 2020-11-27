@@ -17,7 +17,7 @@ _Most_ commands needed to use this project up have been added to the Makefile.
 By default the project is compiled without Lambda support to run against a local DynamoDB instance running on `http://localhost:8000`. 
 
 ### Start Local DynamoDB
-A docker-compose.yml has been provided. Run the command below to start a DynamoDB instance;
+A docker-compose.yml has been provided. Run the command below to start a DynamoDB instance.
 
 ```sh
 docker-compose up -d
@@ -25,7 +25,7 @@ docker-compose up -d
 
 ### Create DynamoDB Table
 
-Docker uses a volume for storage so this only needs to be run once
+Docker uses a volume for storage so this only needs to be run once.
 
 ```sh
 make table.create
@@ -73,13 +73,13 @@ make cross.build.deploy
 ```
 
 ### Other commands
-List DynamoDB tables
+List DynamoDB tables.
 
 ```sh
 make table.list
 ```
 
-Scan DynamoDB table
+Scan DynamoDB table.
 ```sh
 make table.scan
 ```
@@ -89,29 +89,28 @@ Terraform Plan
 make plan
 ```
 
-Remove Terraform resources
+Remove Terraform resources.
 
 ```sh
 make remove
 ```
 
-Test Local Value Lambda
+Test Local Value Lambda.
 ```sh
 make test.local.value
 ```
 
-Test Local Event Lambda
+Test Local Event Lambda.
 ```sh
 make test.local.event
 ```
 
-Test AWS Value Lambda
+Test AWS Value Lambda.
 ```sh
 make test.lambda.value
 ```
 
-
-Test AWS Event Lambda
+Test AWS Event Lambda.
 ```sh
 make test.lambda.event
 ```
