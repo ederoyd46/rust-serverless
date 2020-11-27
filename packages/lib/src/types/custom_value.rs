@@ -21,6 +21,18 @@ impl CustomValue {
     pub fn value(&self) -> &Value {
         &self.value
     }
+
+    // TODO Move to Storable
+    pub fn from_dynamo_db(data: HashMap<String, AttributeValue>) -> Option<Self> {
+        let key = data.get("key")?.s.as_ref()?;
+        let value = build_serde_value(data.get("value")?);
+        
+        Some(Self {
+            key: key.to_string(),
+            value
+        })
+    }
+    
 }
 
 impl Storable for CustomValue {
@@ -37,6 +49,22 @@ impl Storable for CustomValue {
 
         item.insert("value".to_string(), build_attribute_value(self.value()));
         item
+    }
+    
+}
+
+// TODO Handle objects
+fn build_serde_value(attribute: &AttributeValue) -> Value {
+
+    if attribute.s.is_some() {
+        let val = attribute.s.as_ref().unwrap();
+        Value::String(val.to_string())
+    } else if attribute.n.is_some() {
+        let val = attribute.n.as_ref().unwrap();
+        Value::Number(serde_json::Number::from(val.parse::<i64>().unwrap()))
+    } else {
+        let val = attribute.bool.as_ref().unwrap();
+        Value::Bool(*val)
     }
 }
 
