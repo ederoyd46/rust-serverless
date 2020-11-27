@@ -35,7 +35,7 @@ test:
 	@cargo test
 
 cross.build: 
-	cross build --all-features --jobs 2 --target=x86_64-unknown-linux-gnu --release
+	cross build --all-features --jobs 1 --target=x86_64-unknown-linux-gnu --release
 
 cross.package: 
 	@for i in store_event store_value retrieve_value; \
