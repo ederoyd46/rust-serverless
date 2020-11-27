@@ -9,7 +9,6 @@ use rusoto_dynamodb::DynamoDbClient;
 static DB_CLIENT: OnceCell<DynamoDbClient> = OnceCell::new();
 
 pub fn get_db_client() -> Result<&'static DynamoDbClient, Error> {
-
     #[cfg(feature = "with-lambda")]
     let region = Region::EuCentral1;
 

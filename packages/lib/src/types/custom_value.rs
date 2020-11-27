@@ -24,15 +24,13 @@ impl CustomValue {
 
     // TODO Move to Storable
     pub fn from_dynamo_db(data: HashMap<String, AttributeValue>) -> Option<Self> {
-        let key = data.get("key")?.s.as_ref()?;
+        let key = data.get("PK")?.s.as_ref()?;
         let value = build_serde_value(data.get("value")?);
-        
         Some(Self {
             key: key.to_string(),
-            value
+            value,
         })
     }
-    
 }
 
 impl Storable for CustomValue {
@@ -50,12 +48,10 @@ impl Storable for CustomValue {
         item.insert("value".to_string(), build_attribute_value(self.value()));
         item
     }
-    
 }
 
 // TODO Handle objects
 fn build_serde_value(attribute: &AttributeValue) -> Value {
-
     if attribute.s.is_some() {
         let val = attribute.s.as_ref().unwrap();
         Value::String(val.to_string())
@@ -108,7 +104,7 @@ fn build_dynamodb_object(object: Map<String, Value>) -> HashMap<String, Attribut
 }
 
 fn build_dynamodb_array(object: Vec<Value>) -> Vec<AttributeValue> {
-    let mut items = vec!();
+    let mut items = vec![];
 
     for v in object.iter() {
         items.push(build_attribute_value(v))

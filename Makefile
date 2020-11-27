@@ -15,7 +15,7 @@ release:
 	@cargo build --all-features --release
 
 package: 
-	@for i in store_event store_value; \
+	@for i in store_event store_value retrieve_value; \
 	do \
 		mkdir -p deploy/$$i; \
 		cp target/release/$$i deploy/$$i/bootstrap; \
@@ -38,7 +38,7 @@ cross.build:
 	cross build --all-features --jobs 2 --target=x86_64-unknown-linux-gnu --release
 
 cross.package: 
-	@for i in store_event store_value; \
+	@for i in store_event store_value retrieve_value; \
 	do \
 		mkdir -p deploy/$$i; \
 		cp target/x86_64-unknown-linux-gnu/release/$$i deploy/$$i/bootstrap; \
@@ -53,8 +53,11 @@ test.lambda.event:
 test.lambda.value:
 	@aws lambda invoke --function-name store_value-$(STAGE) --invocation-type=RequestResponse --payload $(shell echo '{ "key": "Key Object", "value": { "valString": "Sub Value 1", "valNumber": 1, "valBool": true, "valObj": { "valString": "Sub Value 2" }, "valArray": [ { "valArray": ["Sub Array 1", "Sub Array 2"] }, "some array string", 1, true ] }}'| base64) out.json | cat
 
+test.lambda.retrieve.value:
+	@aws lambda invoke --function-name retrieve_value-$(STAGE) --invocation-type=RequestResponse --payload $(shell echo "Key Object" | base64) out.json | cat
+
 test.local.event:
-	@for i in 1; \
+	@for i in 1 2 3 4; \
 	do \
 		DATABASE=$(DATA_STORE_NAME) cargo run --bin store_event -- '{"firstName": "Test '$$i'", "lastName": "User"}'; \
 	done;
@@ -67,6 +70,12 @@ test.local.value:
 		DATABASE=$(DATA_STORE_NAME) cargo run --bin store_value -- '{"key": "Key Bool '$$i'", "value": true}'; \
 		DATABASE=$(DATA_STORE_NAME) cargo run --bin store_value -- '{"key": "Key Number '$$i'", "value": 1}'; \
 		DATABASE=$(DATA_STORE_NAME) cargo run --bin store_value -- '{"key": "Key String '$$i'", "value": "Value"}'; \
+	done;
+
+test.local.retrieve.value:
+	@for i in 1; \
+	do \
+		DATABASE=$(DATA_STORE_NAME) cargo run --bin retrieve_value -- "Key Bool $$i"; \
 	done;
 
 table.list:

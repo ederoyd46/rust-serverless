@@ -26,6 +26,7 @@ path = "src/store_event.rs"
 name = "store_value"
 path = "src/store_value.rs"
 
-# [[bin]]
-# name = "retrieve"
-# path = "src/retrieve.rs"
+[[bin]]
+name = "retrieve_value"
+path = "src/retrieve_value.rs"
+

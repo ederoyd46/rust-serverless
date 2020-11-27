@@ -1,9 +1,9 @@
 use log::{self, debug, error};
+use rusoto_dynamodb::AttributeValue;
 use rusoto_dynamodb::{DynamoDb, DynamoDbClient, PutItemInput, PutItemOutput};
 use std::collections::HashMap;
-use rusoto_dynamodb::AttributeValue;
 
-use crate::types::{Storable};
+use crate::types::Storable;
 
 pub async fn store_database_item(
     table_name: &str,

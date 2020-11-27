@@ -11,6 +11,7 @@ pub fn initialise_logger() -> Result<(), Error> {
     if INITIALISED_LOGGER.get().is_none() {
         SimpleLogger::new()
             .with_module_level("store", LevelFilter::Debug)
+            .with_module_level("retrieve", LevelFilter::Debug)
             .with_module_level("lib::database", LevelFilter::Debug)
             .with_level(LevelFilter::Info)
             .init()?;
