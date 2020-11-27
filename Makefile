@@ -85,3 +85,5 @@ table.create:
 		$(ENDPOINT) \
 	| cat
             
+table.remove: 
+	@aws dynamodb delete-table --table-name $(DATA_STORE_NAME) $(ENDPOINT) | cat

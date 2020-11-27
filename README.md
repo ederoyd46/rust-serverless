@@ -1,5 +1,5 @@
 # rust-serverless
-Teaching myself the Rust language and how this would work in a serverless environment.
+Learning the Rust language and how this would work in a serverless environment.
 
 ![Rust](https://github.com/ederoyd46/rust-serverless/workflows/Rust/badge.svg)
 
@@ -82,6 +82,11 @@ make table.list
 Scan DynamoDB table.
 ```sh
 make table.scan
+```
+
+Remove DynamoDB table.
+```sh
+make table.remove
 ```
 
 Terraform Plan
