@@ -1,6 +1,8 @@
 # rust-serverless
 Teaching myself the Rust language and how this would work in a serverless environment.
 
+![Rust](https://github.com/ederoyd46/rust-serverless/workflows/Rust/badge.svg)
+
 ## Dependencies
 - [Rustup](https://rustup.rs/)
 - [Cross](https://crates.io/crates/cross)
@@ -70,4 +72,46 @@ A helper target which runs `cross.build`, `cross.package` and `deploy`
 make cross.build.deploy
 ```
 
-![Rust](https://github.com/ederoyd46/rust-serverless/workflows/Rust/badge.svg)
+### Other commands
+List DynamoDB tables
+
+```sh
+make table.list
+```
+
+Scan DynamoDB table
+```sh
+make table.scan
+```
+
+Terraform Plan
+```sh
+make plan
+```
+
+Remove Terraform resources
+
+```sh
+make remove
+```
+
+Test Local Value Lambda
+```sh
+make test.local.value
+```
+
+Test Local Event Lambda
+```sh
+make test.local.event
+```
+
+Test AWS Value Lambda
+```sh
+make test.lambda.value
+```
+
+
+Test AWS Event Lambda
+```sh
+make test.lambda.event
+```
