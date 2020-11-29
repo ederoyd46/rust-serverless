@@ -1,4 +1,5 @@
 BASE_DIR=$(shell pwd)
+UNAME_S=$(shell uname -s)
 STAGE=${USER}
 DATA_STORE_NAME=rust_serverless_store-$(STAGE)
 ENDPOINT=--endpoint-url http://local.data:8000
@@ -49,7 +50,11 @@ test:
 	@cargo test
 
 cross.build: 
-	cross build --all-features --jobs 1 --target=x86_64-unknown-linux-gnu --release
+	ifeq ($(UNAME_S), Linux)
+		cargo build --all-features --target=x86_64-unknown-linux-gnu --release
+	else
+		cross build --all-features --jobs 2 --target=x86_64-unknown-linux-gnu --release
+	endif
 
 cross.package: 
 	@for i in store_event store_value retrieve_value; \
@@ -62,13 +67,13 @@ cross.package:
 cross.build.deploy: cross.build cross.package deploy
 
 test.lambda.event:
-	@aws lambda invoke --function-name store_event-$(STAGE) --invocation-type=RequestResponse --payload $(shell echo '{"firstName": "Test", "lastName": "User"}' | base64) out.json | cat
+	@$(AWS_CLI) lambda invoke --function-name store_event-$(STAGE) --invocation-type=RequestResponse --payload $(shell echo '{"firstName": "Test", "lastName": "User"}' | base64) out.json | cat
 
 test.lambda.value:
-	@aws lambda invoke --function-name store_value-$(STAGE) --invocation-type=RequestResponse --payload $(shell echo '{ "key": "Key Object", "value": { "valString": "Sub Value 1", "valNumber": 1, "valBool": true, "valObj": { "valString": "Sub Value 2" }, "valArray": [ { "valArray": ["Sub Array 1", "Sub Array 2"] }, "some array string", 1, true ] }}'| base64) out.json | cat
+	@$(AWS_CLI) lambda invoke --function-name store_value-$(STAGE) --invocation-type=RequestResponse --payload $(shell echo '{ "key": "Key Object", "value": { "valString": "Sub Value 1", "valNumber": 1, "valBool": true, "valObj": { "valString": "Sub Value 2" }, "valArray": [ { "valArray": ["Sub Array 1", "Sub Array 2"] }, "some array string", 1, true ] }}'| base64) out.json | cat
 
 test.lambda.retrieve.value:
-	@aws lambda invoke --function-name retrieve_value-$(STAGE) --invocation-type=RequestResponse --payload $(shell echo "Key Object" | base64) out.json | cat
+	@$(AWS_CLI) lambda invoke --function-name retrieve_value-$(STAGE) --invocation-type=RequestResponse --payload $(shell echo "Key Object" | base64) out.json | cat
 
 test.local.event:
 	@for i in 1 2 3 4; \
