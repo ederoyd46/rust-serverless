@@ -1,7 +1,18 @@
 BASE_DIR=$(shell pwd)
 STAGE=${USER}
 DATA_STORE_NAME=rust_serverless_store-$(STAGE)
-ENDPOINT=--endpoint-url http://localhost:8000
+ENDPOINT=--endpoint-url http://local.data:8000
+
+AWS_CLI_VERSION=2.1.4
+TERRAFORM_VERSION=0.13.5
+
+# Not convinced this is a good idea...
+AWS_CLI=docker run --rm -it \
+	--network=rust-serverless_dynamodb \
+	--link rust-serverless_dynamodb_1:local.data \
+	-v ~/.aws:/root/.aws amazon/aws-cli:$(AWS_CLI_VERSION)
+
+TERRAFORM=docker run --rm -v ~/.aws:/root/.aws -v $(PWD):/workspace -w /workspace hashicorp/terraform:$(TERRAFORM_VERSION)
 
 .PHONY: deploy
 
@@ -23,13 +34,16 @@ package:
 	done;
 
 plan:
-	@terraform plan -var stage=$(STAGE) infrastructure
+	@$(TERRAFORM) plan -var stage=$(STAGE) infrastructure
+
+terraform.init:
+	@$(TERRAFORM) init infrastructure
 
 deploy:
-	@terraform apply -var stage=$(STAGE) -auto-approve infrastructure
+	@$(TERRAFORM) apply -var stage=$(STAGE) -auto-approve infrastructure
 
 remove:
-	@terraform destroy -var stage=$(STAGE) -auto-approve infrastructure
+	@$(TERRAFORM) destroy -var stage=$(STAGE) -auto-approve infrastructure
 
 test:
 	@cargo test
@@ -79,20 +93,19 @@ test.local.retrieve.value:
 	done;
 
 table.list:
-	@aws dynamodb list-tables $(ENDPOINT) | cat
+	@$(AWS_CLI) dynamodb list-tables $(ENDPOINT)
 
 table.scan:
-	@aws dynamodb scan --table-name $(DATA_STORE_NAME) $(ENDPOINT) | cat
+	@$(AWS_CLI) dynamodb scan --table-name $(DATA_STORE_NAME) $(ENDPOINT)
 
 table.create:
-	@aws dynamodb create-table --table-name $(DATA_STORE_NAME) \
+	@$(AWS_CLI) dynamodb create-table --table-name $(DATA_STORE_NAME) \
 		--attribute-definitions \
 			AttributeName=PK,AttributeType=S \
 		--key-schema \
 			AttributeName=PK,KeyType=HASH \
 		--billing-mode PAY_PER_REQUEST \
-		$(ENDPOINT) \
-	| cat
+		$(ENDPOINT)
             
 table.remove: 
-	@aws dynamodb delete-table --table-name $(DATA_STORE_NAME) $(ENDPOINT) | cat
+	@$(AWS_CLI) dynamodb delete-table --table-name $(DATA_STORE_NAME) $(ENDPOINT)
