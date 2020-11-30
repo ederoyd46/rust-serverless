@@ -50,11 +50,11 @@ test:
 	@cargo test
 
 cross.build: 
-	ifeq ($(UNAME_S), Linux)
-		cargo build --all-features --target=x86_64-unknown-linux-gnu --release
-	else
-		cross build --all-features --jobs 2 --target=x86_64-unknown-linux-gnu --release
-	endif
+ifeq ("$(UNAME_S)","Linux")
+	cargo build --all-features --target=x86_64-unknown-linux-gnu --release
+else
+	cross build --all-features --jobs 2 --target=x86_64-unknown-linux-gnu --release
+endif
 
 cross.package: 
 	@for i in store_event store_value retrieve_value; \
@@ -111,6 +111,6 @@ table.create:
 			AttributeName=PK,KeyType=HASH \
 		--billing-mode PAY_PER_REQUEST \
 		$(ENDPOINT)
-            
+			
 table.remove: 
 	@$(AWS_CLI) dynamodb delete-table --table-name $(DATA_STORE_NAME) $(ENDPOINT)
