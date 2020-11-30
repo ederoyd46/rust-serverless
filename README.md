@@ -40,22 +40,22 @@ make build
 ### Compile with Lambda Support
 
 ```sh
+make build.with.features
+```
+_NOTE - If you're working on a Mac this will not work if you deploy it to AWS._
+
+### Release
+This will compile with Lambda support for release to keep the binary size down. We create static binaries so we don't need to worry about glibc versions.
+
+```sh
 make release
 ```
-_NOTE - If you're working on a Mac this will not work if you deploy it to AWS. Even when running Ubuntu 20.04 this uses the wrong GLIBC version so easier to use the cross compile commands._
 
-### Cross Compile
-This will compile with Lambda support for release to keep the binary size down.
-
-```sh
-make cross.build
-```
-
-### Cross Package
-This will rename the binaries to bootstrap and package them into zip files ready to deploy to AWS. This target assumes you've used `cross.build`.
+###  Package
+This will rename the binaries to bootstrap and package them into zip files ready to deploy to AWS. This target assumes you've used `release`.
 
 ```sh
-make cross.package
+make package
 ```
 
 ### Deploy
@@ -65,14 +65,19 @@ This target runs Terraform and deploys the Lambdas.
 make deploy
 ```
 
-### Cross Package Deploy
-A helper target which runs `cross.build`, `cross.package` and `deploy`
+### Build Package Deploy
+A helper target which runs `build`, `package` and `deploy`
 
 ```sh
-make cross.build.deploy
+make build.package.deploy
 ```
 
 ### Other commands
+Build the docker image to compile static binaries on (only needed if you're not using Linux)
+```sh
+make build.image
+```
+
 List DynamoDB tables.
 
 ```sh

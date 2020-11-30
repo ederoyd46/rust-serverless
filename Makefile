@@ -44,19 +44,8 @@ endif
 build: 
 	@cargo build 
 
-build_with_features: 
+build.with.features: 
 	@cargo build --all-features
-
-release: 
-	@cargo build --all-features --release
-
-package: 
-	@for i in store_event store_value retrieve_value; \
-	do \
-		mkdir -p deploy/$$i; \
-		cp target/release/$$i deploy/$$i/bootstrap; \
-		zip -j -9 deploy/$$i.zip deploy/$$i/bootstrap; \
-	done;
 
 test:
 	@cargo test
@@ -77,19 +66,19 @@ remove:
 
 
 # Cross Compile for deployment to AWS
-CROSS_TARGET=x86_64-unknown-linux-musl
-
-cross.build.image:
+build.image:
 	@docker build -t ederoyd46/rust:build - < Dockerfile
 
-cross.build:
+CROSS_TARGET=x86_64-unknown-linux-musl
+
+release:
 ifeq ("$(UNAME_S)","Linux")
 	cargo build --all-features --target=$(CROSS_TARGET) --release
 else
 	cross build --all-features --jobs 2 --target=$(CROSS_TARGET) --release
 endif
 
-cross.package: 
+package: 
 	@for i in store_event store_value retrieve_value; \
 	do \
 		mkdir -p deploy/$$i; \
@@ -97,7 +86,7 @@ cross.package:
 		zip -j -9 deploy/$$i.zip deploy/$$i/bootstrap; \
 	done;
 
-cross.build.deploy: cross.build cross.package deploy
+build.package.deploy: release package deploy
 
 
 # TEST
