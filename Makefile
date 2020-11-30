@@ -18,7 +18,7 @@ ifeq ($(USE_LOCAL_AWS), true)
 else
 	AWS_CLI=docker run --rm -it \
 		--network=rust-serverless_dynamodb \
-		--link rust-serverless_dynamodb_1:localhost \
+		--link rust-serverless_dynamodb_1:${HOSTNAME} \
 		-v ~/.aws:/root/.aws amazon/aws-cli:$(AWS_CLI_VERSION)
 endif
 
