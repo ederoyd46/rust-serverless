@@ -51,7 +51,7 @@ test:
 
 cross.build: 
 ifeq ("$(UNAME_S)","Linux")
-	cargo build --all-features --target=x86_64-unknown-linux-gnu --release
+	cargo build --all-features --target=x86_64-unknown-linux-musl --release
 else
 	cross build --all-features --jobs 2 --target=x86_64-unknown-linux-gnu --release
 endif
@@ -60,7 +60,7 @@ cross.package:
 	@for i in store_event store_value retrieve_value; \
 	do \
 		mkdir -p deploy/$$i; \
-		cp target/x86_64-unknown-linux-gnu/release/$$i deploy/$$i/bootstrap; \
+		cp target/x86_64-unknown-linux-musl/release/$$i deploy/$$i/bootstrap; \
 		zip -j -9 deploy/$$i.zip deploy/$$i/bootstrap; \
 	done;
 
@@ -70,7 +70,7 @@ test.lambda.event:
 	@$(AWS_CLI) lambda invoke --function-name store_event-$(STAGE) --invocation-type=RequestResponse --payload $(shell echo '{"firstName": "Test", "lastName": "User"}' | base64) out.json | cat
 
 test.lambda.value:
-	@$(AWS_CLI) lambda invoke --function-name store_value-$(STAGE) --invocation-type=RequestResponse --payload $(shell echo '{ "key": "Key Object", "value": { "valString": "Sub Value 1", "valNumber": 1, "valBool": true, "valObj": { "valString": "Sub Value 2" }, "valArray": [ { "valArray": ["Sub Array 1", "Sub Array 2"] }, "some array string", 1, true ] }}'| base64) out.json | cat
+	$(AWS_CLI) lambda invoke --function-name store_value-$(STAGE) --invocation-type=RequestResponse --payload $(shell echo '{ "key": "Key Object", "value": { "valString": "Sub Value 1", "valNumber": 1, "valBool": true, "valObj": { "valString": "Sub Value 2" }, "valArray": [ { "valArray": ["Sub Array 1", "Sub Array 2"] }, "some array string", 1, true ] }}' | base64 --wrap=0) out.json | cat
 
 test.lambda.retrieve.value:
 	@$(AWS_CLI) lambda invoke --function-name retrieve_value-$(STAGE) --invocation-type=RequestResponse --payload $(shell echo "Key Object" | base64) out.json | cat
