@@ -22,16 +22,16 @@ jobs:
         restore-keys: ${{ runner.os }}-cargo-${{ hashFiles('Cargo.lock') }}
     - name: Test
       run: make test
-    - name: Build Release
-      run: make release
-    - name: Package
-      run: make package
-    - name: Upload Lambdas
-      uses: actions/upload-artifact@v2
-      with:
-        name: lambdas-${{ runner.os }}.zip
-        path: |
-          deploy/*.zip
+    # - name: Build Release
+    #   run: make release
+    # - name: Package
+    #   run: make package
+    # - name: Upload Lambdas
+    #   uses: actions/upload-artifact@v2
+    #   with:
+    #     name: lambdas-${{ runner.os }}.zip
+    #     path: |
+    #       deploy/*.zip
 
   # release:
   #   needs: build
