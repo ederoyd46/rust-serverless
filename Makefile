@@ -19,7 +19,10 @@ else
 	AWS_CLI=docker run --rm -it \
 		--network=rust-serverless_dynamodb \
 		--link rust-serverless_dynamodb_1:${HOSTNAME} \
-		-v ~/.aws:/root/.aws amazon/aws-cli:$(AWS_CLI_VERSION)
+		-v ~/.aws:/root/.aws \
+		-v $(PWD):/workspace \
+		-w /workspace \
+		amazon/aws-cli:$(AWS_CLI_VERSION)
 endif
 
 ifeq ($(USE_LOCAL_TERRAFORM), true)
@@ -119,7 +122,7 @@ test.local.value:
 		# DATABASE=$(DATA_STORE_NAME) cargo run --bin retrieve_value -- '{"key": "Key Bool '$$i'"}'; \
 		# DATABASE=$(DATA_STORE_NAME) cargo run --bin retrieve_value -- '{"key": "Key Number '$$i'"}'; \
 		# DATABASE=$(DATA_STORE_NAME) cargo run --bin retrieve_value -- '{"key": "Key String '$$i'"}'; \
-		
+
 test.local.retrieve.value:
 	@for i in 1; \
 	do \
