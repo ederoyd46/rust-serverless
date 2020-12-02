@@ -1,11 +1,11 @@
 use rusoto_dynamodb::AttributeValue;
-use serde_derive::Deserialize;
+use serde_derive::{Deserialize, Serialize};
 use serde_json::{Map, Value};
 use std::collections::HashMap;
 
 use super::Storable;
 
-#[derive(Deserialize, Debug)]
+#[derive(Deserialize, Serialize, Debug)]
 pub struct CustomValue {
     #[serde(rename = "key")]
     key: String,
@@ -44,7 +44,6 @@ impl Storable for CustomValue {
 
     fn to_dynamo_db(&self) -> HashMap<String, AttributeValue> {
         let mut item = HashMap::new();
-
         item.insert("value".to_string(), build_attribute_value(self.value()));
         item
     }
@@ -58,9 +57,27 @@ fn build_serde_value(attribute: &AttributeValue) -> Value {
     } else if attribute.n.is_some() {
         let val = attribute.n.as_ref().unwrap();
         Value::Number(serde_json::Number::from(val.parse::<i64>().unwrap()))
+    } else if attribute.bool.is_some() {
+        let val = attribute.bool.unwrap();
+        Value::Bool(val)
+    } else if attribute.m.is_some() {
+        let val = attribute.m.as_ref().unwrap();
+        let mut object = serde_json::Map::new();
+        for (k, v) in val.iter() {
+            object.insert(k.to_string(), build_serde_value(v));
+        }
+        Value::Object(object)
+    } else if attribute.l.is_some() {
+        let val = attribute.l.as_ref().unwrap();
+
+        let mut items = vec![];
+        for v in val.iter() {
+            items.push(build_serde_value(v))
+        }
+
+        Value::Array(items)
     } else {
-        let val = attribute.bool.as_ref().unwrap();
-        Value::Bool(*val)
+        Value::Null
     }
 }
 

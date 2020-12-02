@@ -115,13 +115,15 @@ test.local.value:
 		DATABASE=$(DATA_STORE_NAME) cargo run --bin store_value -- '{"key": "Key String '$$i'", "value": "Value"}'; \
 	done;
 
+		# DATABASE=$(DATA_STORE_NAME) cargo run --bin retrieve_value -- '{"key": "Key Array '$$i'"}'; \
+		# DATABASE=$(DATA_STORE_NAME) cargo run --bin retrieve_value -- '{"key": "Key Bool '$$i'"}'; \
+		# DATABASE=$(DATA_STORE_NAME) cargo run --bin retrieve_value -- '{"key": "Key Number '$$i'"}'; \
+		# DATABASE=$(DATA_STORE_NAME) cargo run --bin retrieve_value -- '{"key": "Key String '$$i'"}'; \
+		
 test.local.retrieve.value:
 	@for i in 1; \
 	do \
-		DATABASE=$(DATA_STORE_NAME) cargo run --bin retrieve_value -- '{"key": "Key Array '$$i'"}'; \
-		DATABASE=$(DATA_STORE_NAME) cargo run --bin retrieve_value -- '{"key": "Key Bool '$$i'"}'; \
-		DATABASE=$(DATA_STORE_NAME) cargo run --bin retrieve_value -- '{"key": "Key Number '$$i'"}'; \
-		DATABASE=$(DATA_STORE_NAME) cargo run --bin retrieve_value -- '{"key": "Key String '$$i'"}'; \
+		DATABASE=$(DATA_STORE_NAME) cargo run --bin retrieve_value -- '{"key": "Key Object '$$i'"}'; \
 	done;
 
 # Table tasks (Local Only)

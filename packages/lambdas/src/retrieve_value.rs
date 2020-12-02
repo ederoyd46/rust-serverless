@@ -1,9 +1,11 @@
-use lib::database::{get_db_client, retrieve_database_item};
-use lib::logger::initialise_logger;
-use lib::types::{CustomOutput, CustomRetrieveValue, CustomValue, Error};
-
 #[cfg(feature = "with-lambda")]
 use lambda::{lambda, Context};
+
+use serde_json::Value;
+
+use lib::database::{get_db_client, retrieve_database_item};
+use lib::logger::initialise_logger;
+use lib::types::{CustomRetrieveValue, CustomValue, Error};
 
 use log::debug;
 
@@ -12,7 +14,7 @@ use std::env;
 #[cfg(feature = "with-lambda")]
 #[lambda]
 #[tokio::main]
-async fn main(event: CustomRetrieveValue, _: Context) -> Result<CustomOutput, Error> {
+async fn main(event: CustomRetrieveValue, _: Context) -> Result<Value, Error> {
     handler(&event).await
 }
 
@@ -27,20 +29,17 @@ async fn main() -> Result<(), Error> {
 
     let input: CustomRetrieveValue = serde_json::from_str(&input_str.unwrap())?;
     let output = handler(&input).await?;
-    debug!("{:?}", output);
+    debug!("{}", output.to_string());
+
     Ok(())
 }
 
-async fn handler(key: &CustomRetrieveValue) -> Result<CustomOutput, Error> {
+async fn handler(key: &CustomRetrieveValue) -> Result<Value, Error> {
     initialise_logger()?;
     let table_name = env::var("DATABASE").unwrap();
-    
     debug!("Database table is {}", table_name);
 
     let item_from_dynamo = retrieve_database_item(&table_name, key, get_db_client()?).await;
-    let value = CustomValue::from_dynamo_db(item_from_dynamo.item.unwrap());
-
-    Ok(CustomOutput {
-        message: format!("Retrieved, {:?}!", value),
-    })
+    let retrieved_item = CustomValue::from_dynamo_db(item_from_dynamo.item.unwrap()).unwrap();
+    Ok(retrieved_item.value().clone())
 }
