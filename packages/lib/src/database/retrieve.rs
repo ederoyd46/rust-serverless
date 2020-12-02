@@ -2,14 +2,15 @@ use log::{self, debug, error};
 use rusoto_dynamodb::AttributeValue;
 use rusoto_dynamodb::{DynamoDb, DynamoDbClient, GetItemInput, GetItemOutput};
 use std::collections::HashMap;
+use crate::types::{CustomRetrieveValue};
 
 pub async fn retrieve_database_item(
     table_name: &str,
-    key: &str,
+    retrieve_value: &CustomRetrieveValue,
     client: &DynamoDbClient,
 ) -> GetItemOutput {
     let get_item = GetItemInput {
-        key: build_key_entry(key),
+        key: build_key_entry(retrieve_value.key.as_ref()),
         table_name: table_name.to_string(),
         ..Default::default()
     };

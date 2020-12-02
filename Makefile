@@ -97,7 +97,7 @@ test.lambda.value:
 	@$(AWS_CLI) lambda invoke --function-name store_value-$(STAGE) --invocation-type=RequestResponse --payload $(shell echo '{ "key": "Key Object", "value": { "valString": "Sub Value 1", "valNumber": 1, "valBool": true, "valObj": { "valString": "Sub Value 2" }, "valArray": [ { "valArray": ["Sub Array 1", "Sub Array 2"] }, "some array string", 1, true ] }}' | $(BASE64)) out.json | cat
 
 test.lambda.retrieve.value:
-	@$(AWS_CLI) lambda invoke --function-name retrieve_value-$(STAGE) --invocation-type=RequestResponse --payload $(shell echo "Key Object" | $(BASE64)) out.json | cat
+	@$(AWS_CLI) lambda invoke --function-name retrieve_value-$(STAGE) --invocation-type=RequestResponse --payload $(shell echo '{ "key": "Key Object" }' | $(BASE64)) out.json | cat
 
 test.local.event:
 	@for i in 1 2 3 4; \
@@ -118,7 +118,10 @@ test.local.value:
 test.local.retrieve.value:
 	@for i in 1; \
 	do \
-		DATABASE=$(DATA_STORE_NAME) cargo run --bin retrieve_value -- "Key Bool $$i"; \
+		DATABASE=$(DATA_STORE_NAME) cargo run --bin retrieve_value -- '{"key": "Key Array '$$i'"}'; \
+		DATABASE=$(DATA_STORE_NAME) cargo run --bin retrieve_value -- '{"key": "Key Bool '$$i'"}'; \
+		DATABASE=$(DATA_STORE_NAME) cargo run --bin retrieve_value -- '{"key": "Key Number '$$i'"}'; \
+		DATABASE=$(DATA_STORE_NAME) cargo run --bin retrieve_value -- '{"key": "Key String '$$i'"}'; \
 	done;
 
 # Table tasks (Local Only)
