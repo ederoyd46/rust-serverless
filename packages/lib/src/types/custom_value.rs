@@ -3,7 +3,7 @@ use serde_derive::{Deserialize, Serialize};
 use serde_json::{Map, Number, Value};
 use std::collections::HashMap;
 
-use super::Storable;
+use super::{Retrievable, Storable};
 
 #[derive(Deserialize, Serialize, Debug)]
 pub struct CustomValue {
@@ -21,9 +21,10 @@ impl CustomValue {
     pub fn value(&self) -> &Value {
         &self.value
     }
+}
 
-    // TODO Move to Storable
-    pub fn from_dynamo_db(data: HashMap<String, AttributeValue>) -> Option<Self> {
+impl Retrievable<Self> for CustomValue {
+    fn from_dynamo_db(data: HashMap<String, AttributeValue>) -> Option<Self> {
         let key = data.get("PK")?.s.as_ref()?;
         let value = build_serde_value(data.get("value")?);
         Some(Self {
@@ -32,7 +33,6 @@ impl CustomValue {
         })
     }
 }
-
 impl Storable for CustomValue {
     fn is_valid(&self) -> bool {
         !self.key().is_empty()

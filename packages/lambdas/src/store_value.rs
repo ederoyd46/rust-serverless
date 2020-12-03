@@ -56,3 +56,51 @@ async fn handler<T: Storable>(event: T) -> Result<CustomOutput, Error> {
         message: format!("Stored, {}!", event.get_pk()),
     })
 }
+
+// #[cfg(test)]
+// mod tests {
+//     use mockall::{mock};
+//     use lambda_runtime::Context;
+//     use super::{CustomEvent, CustomOutput};
+//     use super::env::{set_var};
+
+//     mock! {
+//         DynamoDbClient {}
+//     }
+
+//     #[test]
+//     fn test_lambda_handler() {
+//         let mut _mock_dynamo_db_client = MockDynamoDbClient::new();
+//         set_var("DATABASE", "TEST");
+
+//         let expected_response = CustomOutput {
+//             message: "Hello First".to_string()
+//         };
+
+//         let lambda_context = Context {
+//             aws_request_id: "0123456789".to_string(),
+//             function_name: "test_function_name".to_string(),
+//             memory_limit_in_mb: 128,
+//             function_version: "$LATEST".to_string(),
+//             invoked_function_arn: "arn:aws:lambda".to_string(),
+//             xray_trace_id: Some("0987654321".to_string()),
+//             client_context: Option::default(),
+//             identity: Option::default(),
+//             log_stream_name: "logStreamName".to_string(),
+//             log_group_name: "logGroupName".to_string(),
+//             deadline: 0,
+//         };
+
+//         let lambda_request = CustomEvent {
+//             first_name: "First".to_string(),
+//         };
+
+//         // Check the result is ok
+//         let result = super::my_handler(lambda_request, lambda_context);
+//         assert_eq!(result.is_err(), false, "Error: {}", result.err().unwrap());
+
+//         // Confirm the expected values in result
+//         let value = result.ok().unwrap();
+//         assert_eq!(value.message, expected_response.message);
+//     }
+// }

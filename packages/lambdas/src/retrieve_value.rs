@@ -5,7 +5,7 @@ use serde_json::Value;
 
 use lib::database::{get_db_client, retrieve_database_item};
 use lib::logger::initialise_logger;
-use lib::types::{CustomRetrieveValue, CustomValue, Error};
+use lib::types::{CustomRetrieveValue, CustomValue, Error, Retrievable};
 
 use log::debug;
 
