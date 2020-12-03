@@ -93,20 +93,11 @@ build.package.deploy: release package deploy
 
 
 # TEST
-test.lambda.event:
-	@$(AWS_CLI) lambda invoke --function-name store_event-$(STAGE) --invocation-type=RequestResponse --payload $(shell echo '{"firstName": "Test", "lastName": "User"}' | $(BASE64)) out.json | cat
-
 test.lambda.value:
 	@$(AWS_CLI) lambda invoke --function-name store_value-$(STAGE) --invocation-type=RequestResponse --payload $(shell echo '{ "key": "Key Object", "value": { "valString": "Sub Value 1", "valNumber": 1, "valBool": true, "valObj": { "valString": "Sub Value 2" }, "valArray": [ { "valArray": ["Sub Array 1", "Sub Array 2"] }, "some array string", 1, true ] }}' | $(BASE64)) out.json | cat
 
 test.lambda.retrieve.value:
 	@$(AWS_CLI) lambda invoke --function-name retrieve_value-$(STAGE) --invocation-type=RequestResponse --payload $(shell echo '{ "key": "Key Object" }' | $(BASE64)) out.json | cat
-
-test.local.event:
-	@for i in 1 2 3 4; \
-	do \
-		DATABASE=$(DATA_STORE_NAME) cargo run --bin store_event -- '{"firstName": "Test '$$i'", "lastName": "User"}'; \
-	done;
 
 test.local.value:
 	@for i in 1; \

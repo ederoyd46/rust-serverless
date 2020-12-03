@@ -110,9 +110,9 @@ Test Local Value Lambda.
 make test.local.value
 ```
 
-Test Local Event Lambda.
+Test Local Retrieve Value Lambda.
 ```sh
-make test.local.event
+make test.local.retrieve.value
 ```
 
 Test AWS Value Lambda.
@@ -120,7 +120,7 @@ Test AWS Value Lambda.
 make test.lambda.value
 ```
 
-Test AWS Event Lambda.
+Test AWS Retrieve Value Lambda.
 ```sh
-make test.lambda.event
+make test.lambda.retrieve.value
 ```
