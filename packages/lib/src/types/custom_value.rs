@@ -1,6 +1,6 @@
 use rusoto_dynamodb::AttributeValue;
 use serde_derive::{Deserialize, Serialize};
-use serde_json::{Map, Value};
+use serde_json::{Map, Number, Value};
 use std::collections::HashMap;
 
 use super::Storable;
@@ -43,39 +43,32 @@ impl Storable for CustomValue {
     }
 
     fn to_dynamo_db(&self) -> HashMap<String, AttributeValue> {
-        let mut item = HashMap::new();
-        item.insert("value".to_string(), build_attribute_value(self.value()));
-        item
+        vec![("value".to_string(), build_attribute_value(self.value()))]
+            .into_iter()
+            .collect()
     }
 }
 
-// TODO Handle objects
 fn build_serde_value(attribute: &AttributeValue) -> Value {
     if attribute.s.is_some() {
         let val = attribute.s.as_ref().unwrap();
         Value::String(val.to_string())
     } else if attribute.n.is_some() {
         let val = attribute.n.as_ref().unwrap();
-        Value::Number(serde_json::Number::from(val.parse::<i64>().unwrap()))
+        Value::Number(Number::from(val.parse::<i64>().unwrap()))
     } else if attribute.bool.is_some() {
         let val = attribute.bool.unwrap();
         Value::Bool(val)
     } else if attribute.m.is_some() {
         let val = attribute.m.as_ref().unwrap();
-        let mut object = serde_json::Map::new();
-        for (k, v) in val.iter() {
-            object.insert(k.to_string(), build_serde_value(v));
-        }
-        Value::Object(object)
+        Value::Object(
+            val.iter()
+                .map(|(k, v)| (k.to_string(), build_serde_value(v)))
+                .collect(),
+        )
     } else if attribute.l.is_some() {
         let val = attribute.l.as_ref().unwrap();
-
-        let mut items = vec![];
-        for v in val.iter() {
-            items.push(build_serde_value(v))
-        }
-
-        Value::Array(items)
+        Value::Array(val.iter().map(|v| build_serde_value(v)).collect())
     } else {
         Value::Null
     }
@@ -111,21 +104,102 @@ fn build_attribute_value(value: &Value) -> AttributeValue {
 }
 
 fn build_dynamodb_object(object: Map<String, Value>) -> HashMap<String, AttributeValue> {
-    let mut items = HashMap::new();
-
-    for (k, v) in object.iter() {
-        items.insert(k.to_string(), build_attribute_value(v));
-    }
-
-    items
+    object
+        .iter()
+        .map(|(k, v)| (k.to_string(), build_attribute_value(v)))
+        .collect()
 }
 
 fn build_dynamodb_array(object: Vec<Value>) -> Vec<AttributeValue> {
-    let mut items = vec![];
+    object.iter().map(|v| build_attribute_value(v)).collect()
+}
 
-    for v in object.iter() {
-        items.push(build_attribute_value(v))
+#[cfg(test)]
+mod tests {
+    use super::build_attribute_value;
+    use rusoto_dynamodb::AttributeValue;
+    use serde_json::{Number, Value};
+
+    #[test]
+    fn test_build_string_attribute_value() {
+        let value = Value::String("String Value".to_string());
+        let expected = AttributeValue {
+            s: Some("String Value".to_string()),
+            ..Default::default()
+        };
+        assert_eq!(build_attribute_value(&value), expected);
     }
 
-    items
+    #[test]
+    fn test_build_number_attribute_value() {
+        let value = Value::Number(Number::from(100));
+        let expected = AttributeValue {
+            n: Some(100.to_string()),
+            ..Default::default()
+        };
+        assert_eq!(build_attribute_value(&value), expected);
+    }
+
+    #[test]
+    fn test_build_boolean_attribute_value() {
+        let value = Value::Bool(true);
+        let expected = AttributeValue {
+            bool: Some(true),
+            ..Default::default()
+        };
+        assert_eq!(build_attribute_value(&value), expected);
+    }
+
+    #[test]
+    fn test_build_object_attribute_value() {
+        let value = Value::Object(
+            vec![("boolean".to_string(), Value::Bool(true))]
+                .into_iter()
+                .collect(),
+        );
+
+        let expected = AttributeValue {
+            m: Some(
+                vec![(
+                    "boolean".to_string(),
+                    AttributeValue {
+                        bool: Some(true),
+                        ..Default::default()
+                    },
+                )]
+                .into_iter()
+                .collect(),
+            ),
+            ..Default::default()
+        };
+        assert_eq!(build_attribute_value(&value), expected);
+    }
+
+    #[test]
+    fn test_build_list_attribute_value() {
+        let list_value = vec![Value::Bool(true), Value::String("String Value".to_string())]
+            .into_iter()
+            .collect();
+
+        let value = Value::Array(list_value);
+
+        let expected = AttributeValue {
+            l: Some(
+                vec![
+                    AttributeValue {
+                        bool: Some(true),
+                        ..Default::default()
+                    },
+                    AttributeValue {
+                        s: Some("String Value".to_string()),
+                        ..Default::default()
+                    },
+                ]
+                .into_iter()
+                .collect(),
+            ),
+            ..Default::default()
+        };
+        assert_eq!(build_attribute_value(&value), expected);
+    }
 }
