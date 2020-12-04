@@ -16,6 +16,40 @@ _Most_ commands needed to use this project up have been added to the Makefile.
 
 By default the project is compiled without Lambda support to run against a local DynamoDB instance running on `http://localhost:8000`. 
 
+### Set up Mac OS for Cross Compiling to Static Linux Binaries
+
+It saves a considerable amount of time to cross compile on Mac OS instead of using Docker with Cross.
+
+Assuming you're using brew, run;
+
+```sh
+brew install musl-cross
+```
+
+Change the `USE_DOCKER_CROSS_COMPILE` variable to `false` in the Makefile.
+
+Make sure you've installed the correct toolchain with `rustup`
+
+```sh
+rustup component add rust-std-x86_64-unknown-linux-musl
+```
+
+### Set up Linux for Cross Compiling to Static Binaries
+
+If you're on Ubuntu, run; 
+
+```sh
+apt-get install -y musl musl-dev musl-tools
+```
+
+Make sure you've installed the correct toolchain with `rustup`
+
+```sh
+rustup component add rust-std-x86_64-unknown-linux-musl
+```
+
+
+
 ### Start Local DynamoDB
 A docker-compose.yml has been provided. Run the command below to start a DynamoDB instance.
 
@@ -73,7 +107,8 @@ make build.package.deploy
 ```
 
 ### Other commands
-Build the docker image to compile static binaries on (only needed if you're not using Linux)
+Build the docker image to compile static binaries on (only needed if you're not using Linux and don't have musl set up locally).
+
 ```sh
 make build.image
 ```
@@ -124,3 +159,4 @@ Test AWS Retrieve Value Lambda.
 ```sh
 make test.lambda.retrieve.value
 ```
+

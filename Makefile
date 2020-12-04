@@ -12,6 +12,9 @@ AWS_CLI_VERSION=2.1.4
 USE_LOCAL_TERRAFORM=false
 TERRAFORM_VERSION=0.13.5
 
+# Use Docker to Cross compile Linux Binaries (this can be slow)
+USE_DOCKER_CROSS_COMPILE=false
+
 # Task conditionals
 ifeq ($(USE_LOCAL_AWS), true)
 	AWS_CLI=aws
@@ -73,16 +76,20 @@ build.image:
 	@docker build -t ederoyd46/rust:build - < Dockerfile
 
 CROSS_TARGET=x86_64-unknown-linux-musl
-
+CROSS_COMPILE=x86_64-linux-musl-
 release:
 ifeq ("$(UNAME_S)","Linux")
 	cargo build --all-features --target=$(CROSS_TARGET) --release
 else
+ifeq ("$(USE_DOCKER_CROSS_COMPILE)","true")
 	cross build --all-features --jobs 2 --target=$(CROSS_TARGET) --release
+else
+	CROSS_COMPILE=$(CROSS_COMPILE) cargo build --all-features --target=$(CROSS_TARGET) --release
+endif
 endif
 
 package: 
-	@for i in store_event store_value retrieve_value; \
+	@for i in store_value retrieve_value; \
 	do \
 		mkdir -p deploy/$$i; \
 		cp target/$(CROSS_TARGET)/release/$$i deploy/$$i/bootstrap; \
