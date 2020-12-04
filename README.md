@@ -14,7 +14,7 @@ Learning the Rust language and how this would work in a serverless environment.
 ## Setup
 _Most_ commands needed to use this project up have been added to the Makefile.
 
-By default the project is compiled without Lambda support to run against a local DynamoDB instance running on `http://localhost:8000`. 
+By default the project is compiled without Lambda support to run against a local DynamoDB instance running on `http://${your_hostname}:8000`. 
 
 ### Set up Mac OS for Cross Compiling to Static Linux Binaries
 
