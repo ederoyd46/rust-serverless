@@ -79,12 +79,12 @@ CROSS_TARGET=x86_64-unknown-linux-musl
 CROSS_COMPILE=x86_64-linux-musl-
 release:
 ifeq ("$(UNAME_S)","Linux")
-	cargo build --all-features --target=$(CROSS_TARGET) --release
+	@cargo build --all-features --target=$(CROSS_TARGET) --release
 else
 ifeq ("$(USE_DOCKER_CROSS_COMPILE)","true")
-	cross build --all-features --jobs 2 --target=$(CROSS_TARGET) --release
+	@cross build --all-features --jobs 2 --target=$(CROSS_TARGET) --release
 else
-	CROSS_COMPILE=$(CROSS_COMPILE) cargo build --all-features --target=$(CROSS_TARGET) --release
+	@CROSS_COMPILE=$(CROSS_COMPILE) cargo build --all-features --target=$(CROSS_TARGET) --release
 endif
 endif
 
