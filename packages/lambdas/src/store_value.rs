@@ -1,6 +1,7 @@
 use lib::database::{get_db_client, store_database_item};
 use lib::logger::initialise_logger;
 use lib::types::{CustomOutput, CustomValue, Error, Storable};
+use lib::error_and_panic;
 
 #[cfg(feature = "with-lambda")]
 use lambda::{lambda, Context};
@@ -27,10 +28,7 @@ async fn main() -> Result<(), Error> {
 
     let input: CustomValue = match serde_json::from_str(&input_str.unwrap()) {
         Ok(item) => item,
-        Err(e) => {
-            error!("Could not parse input to known type {}", e);
-            panic!("Could not parse input to known type {}", e)
-        }
+        Err(e) => error_and_panic!("Could not parse input to known type", e)
     };
 
     let output = handler(input).await?;
@@ -44,8 +42,7 @@ async fn handler<T: Storable>(event: T) -> Result<CustomOutput, Error> {
     debug!("Database table is {}", table_name);
 
     if !event.is_valid() {
-        error!("No key specified");
-        panic!("No key specified");
+        error_and_panic!("No key specified");
     }
 
     let item_from_dynamo = store_database_item(&table_name, &event, get_db_client()?).await;

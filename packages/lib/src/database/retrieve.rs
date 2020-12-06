@@ -3,6 +3,7 @@ use rusoto_dynamodb::AttributeValue;
 use rusoto_dynamodb::{DynamoDb, DynamoDbClient, GetItemInput, GetItemOutput};
 use std::collections::HashMap;
 use crate::types::{CustomRetrieveValue};
+use crate::error_and_panic;
 
 pub async fn retrieve_database_item(
     table_name: &str,
@@ -18,12 +19,9 @@ pub async fn retrieve_database_item(
     debug!("About to get from DynamoDB");
     let item_from_dynamo = match client.get_item(get_item).await {
         Ok(item) => item,
-        Err(e) => {
-            let error_message = format!("Error completing read to database: {}", e);
-            error!("{}", &error_message);
-            panic!(error_message);
-        }
+        Err(e) => error_and_panic!("Error completing read to database", e)
     };
+
     debug!("Retrieved from DynamoDB");
 
     item_from_dynamo
