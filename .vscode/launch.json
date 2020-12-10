@@ -7,37 +7,37 @@
         {
             "type": "lldb",
             "request": "launch",
-            "name": "Debug executable 'store'",
+            "name": "Debug executable 'store_value'",
             "env": {
                 "DATABASE": "rust_serverless_store-${env:USER}"
             },
             "cargo": {
                 "args": [
                     "build",
-                    "--bin=store",
+                    "--bin=store_value",
                     "--package=lambdas"
                 ],
                 "filter": {
-                    "name": "store",
+                    "name": "store_value",
                     "kind": "bin"
                 }
             },
-            "args": ["{\"firstName\": \"Test\"}"],
+            "args": ["{\"key\": \"Key\", \"value\": \"Value\"}"],
             "cwd": "${workspaceFolder}"
         },
         {
             "type": "lldb",
             "request": "launch",
-            "name": "Debug unit tests in executable 'store'",
+            "name": "Debug unit tests in executable 'store_value'",
             "cargo": {
                 "args": [
                     "test",
                     "--no-run",
-                    "--bin=store",
+                    "--bin=store_value",
                     "--package=lambdas"
                 ],
                 "filter": {
-                    "name": "store",
+                    "name": "store_value",
                     "kind": "bin"
                 }
             },
