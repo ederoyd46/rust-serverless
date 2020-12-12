@@ -31,7 +31,7 @@ endif
 ifeq ($(USE_LOCAL_TERRAFORM), true)
 	TERRAFORM=terraform
 else
-	TERRAFORM=docker run --rm -v ~/.aws:/root/.aws -v $(PWD):/workspace \
+	TERRAFORM=docker run --rm -it -v ~/.aws:/root/.aws -v $(PWD):/workspace \
 	-w /workspace hashicorp/terraform:$(TERRAFORM_VERSION)
 endif
 
@@ -88,13 +88,25 @@ else
 endif
 endif
 
-package: 
-	@for i in store_value retrieve_value; \
-	do \
-		mkdir -p deploy/$$i; \
-		cp target/$(CROSS_TARGET)/release/$$i deploy/$$i/bootstrap; \
-		zip -j -9 deploy/$$i.zip deploy/$$i/bootstrap; \
-	done;
+# package: 
+# 	@for i in store_value retrieve_value; \
+# 	do \
+# 		mkdir -p deploy/$$i; \
+# 		cp target/$(CROSS_TARGET)/release/$$i deploy/$$i/bootstrap; \
+# 		zip -j -9 deploy/$$i.zip deploy/$$i/bootstrap; \
+# 	done;
+
+package.store_value: 
+	@mkdir -p deploy/store_value
+	@cp target/$(CROSS_TARGET)/release/store_value deploy/store_value/bootstrap
+	@zip -j -9 deploy/store_value.zip deploy/store_value/bootstrap
+
+package.retrieve_value: 
+	@mkdir -p deploy/retrieve_value
+	@cp target/$(CROSS_TARGET)/release/retrieve_value deploy/retrieve_value/bootstrap
+	@zip -j -9 deploy/retrieve_value.zip deploy/retrieve_value/bootstrap
+
+package: package.store_value package.retrieve_value
 
 build.package.deploy: release package deploy
 

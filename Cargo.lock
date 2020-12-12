@@ -643,6 +643,8 @@ dependencies = [
  "lambda",
  "lib",
  "log",
+ "serde",
+ "serde_derive",
  "serde_json",
  "tokio",
 ]

@@ -23,6 +23,39 @@ resource aws_cloudwatch_log_group retrieve_value {
   retention_in_days = 3
 }
 
+# API Gateway
+
+resource aws_api_gateway_method retrieve_value {
+   rest_api_id   = aws_api_gateway_rest_api.api.id
+   resource_id   = aws_api_gateway_rest_api.api.root_resource_id
+   http_method   = "GET"
+   authorization = "NONE"
+}
+
+resource aws_api_gateway_integration retrieve_value {
+   rest_api_id = aws_api_gateway_rest_api.api.id
+   resource_id = aws_api_gateway_method.retrieve_value.resource_id
+   http_method = aws_api_gateway_method.retrieve_value.http_method
+
+   integration_http_method = "GET"
+   type                    = "AWS_PROXY"
+   uri                     = aws_lambda_function.retrieve_value.invoke_arn
+}
+
+resource aws_lambda_permission retrieve_value {
+   statement_id  = "AllowAPIGatewayInvoke"
+   action        = "lambda:InvokeFunction"
+   function_name = aws_lambda_function.retrieve_value.function_name
+   principal     = "apigateway.amazonaws.com"
+
+   # The "/*/*" portion grants access from any method on any resource
+   # within the API Gateway REST API.
+   source_arn = "${aws_api_gateway_rest_api.api.execution_arn}/*/*"
+}
+
+
+
+
 output retrieve_value_lambda {
   value = aws_lambda_function.retrieve_value.arn
 }

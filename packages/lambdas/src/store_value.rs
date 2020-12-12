@@ -1,20 +1,30 @@
-use lib::database::{get_db_client, store_database_item};
-use lib::logger::initialise_logger;
-use lib::types::{CustomOutput, CustomValue, Error, Storable};
-use lib::error_and_panic;
-
 #[cfg(feature = "with-lambda")]
 use lambda::{lambda, Context};
+use lib::database::{get_db_client, store_database_item};
+use lib::error_and_panic;
+use lib::logger::initialise_logger;
+use lib::types::{CustomOutput, CustomValue, Error, Storable};
+use serde_derive::Deserialize;
+
 
 use log::{debug, error, info};
 
 use std::env;
 
+#[derive(Deserialize, Debug)]
+struct Event {
+    pub body: String,
+}
+
 #[cfg(feature = "with-lambda")]
 #[lambda]
 #[tokio::main]
-async fn main(event: CustomValue, _: Context) -> Result<CustomOutput, Error> {
-    handler(event).await
+async fn main(event: Event, _: Context) -> Result<CustomOutput, Error> {
+    let input: CustomValue = match serde_json::from_str(&event.body) {
+        Ok(item) => item,
+        Err(e) => error_and_panic!("Could not parse input to known type", e),
+    };
+    handler(input).await
 }
 
 #[cfg(not(feature = "with-lambda"))]
@@ -28,7 +38,7 @@ async fn main() -> Result<(), Error> {
 
     let input: CustomValue = match serde_json::from_str(&input_str.unwrap()) {
         Ok(item) => item,
-        Err(e) => error_and_panic!("Could not parse input to known type", e)
+        Err(e) => error_and_panic!("Could not parse input to known type", e),
     };
 
     let output = handler(input).await?;
@@ -50,7 +60,8 @@ async fn handler<T: Storable>(event: T) -> Result<CustomOutput, Error> {
     info!("item: {:?}", item_from_dynamo);
 
     Ok(CustomOutput {
-        message: format!("Stored, {}!", event.get_pk()),
+        body: format!("Stored, {}!", event.get_pk()),
+        status: 200
     })
 }
 
