@@ -6,17 +6,11 @@ version = "0.2.0"
 
 [dependencies]
 lambda = {git = "https://github.com/awslabs/aws-lambda-rust-runtime/", rev = "13aa8f01813e6949ca91aedafb286591fdf32217"}
+lambda_http = {git = "https://github.com/awslabs/aws-lambda-rust-runtime/", rev = "13aa8f01813e6949ca91aedafb286591fdf32217"}
 lib = {path = "../lib"}
 log = "^0.4"
 tokio = "^0.2"
 serde_json = "^1"
-
-# TODO Temporarily Add these in until I can sort out the types
-serde = {version = "^1", features = ["derive"]}
-serde_derive = "^1"
-
-
-
 
 # [dev-dependencies]
 # mockall = "0.8.0"

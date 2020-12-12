@@ -1,30 +1,38 @@
-#[cfg(feature = "with-lambda")]
-use lambda::{lambda, Context};
+// #[cfg(feature = "with-lambda")]
+// use lambda::{lambda, Context};
 use lib::database::{get_db_client, store_database_item};
 use lib::error_and_panic;
 use lib::logger::initialise_logger;
 use lib::types::{CustomOutput, CustomValue, Error, Storable};
-use serde_derive::Deserialize;
 
+#[cfg(feature = "with-lambda")]
+use lambda_http::{
+    lambda::{lambda, Context},
+    Body, IntoResponse, Request,
+};
 
 use log::{debug, error, info};
 
 use std::env;
 
-#[derive(Deserialize, Debug)]
-struct Event {
-    pub body: String,
-}
-
 #[cfg(feature = "with-lambda")]
-#[lambda]
+#[lambda(http)]
 #[tokio::main]
-async fn main(event: Event, _: Context) -> Result<CustomOutput, Error> {
-    let input: CustomValue = match serde_json::from_str(&event.body) {
+async fn main(event: Request, _: Context) -> Result<impl IntoResponse, Error> {
+    let body = match event.body() {
+        Body::Text(val) => val.as_ref(),
+        _ => error_and_panic!("Invalid input, please use a string"), // Currently we only accept text
+    };
+
+    let input: CustomValue = match serde_json::from_str(body) {
         Ok(item) => item,
         Err(e) => error_and_panic!("Could not parse input to known type", e),
     };
-    handler(input).await
+
+    match handler(input).await {
+        Ok(val) => Ok(val.body),
+        Err(e) => error_and_panic!("Could not store data", e),
+    }
 }
 
 #[cfg(not(feature = "with-lambda"))]
@@ -61,7 +69,7 @@ async fn handler<T: Storable>(event: T) -> Result<CustomOutput, Error> {
 
     Ok(CustomOutput {
         body: format!("Stored, {}!", event.get_pk()),
-        status: 200
+        status: 200,
     })
 }
 
