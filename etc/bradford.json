@@ -1,0 +1,32 @@
+{
+    "key": "Bradford",
+    "value": {
+        "geometry": {
+            "coordinates": [
+                -1.7519186,
+                53.7944229
+            ],
+            "type": "Point"
+        },
+        "properties": {
+            "alt_name": "Curry Capital of Britain 2011-2016",
+            "alt_name:mk": "Бредфорд",
+            "name": "Bradford",
+            "name:be": "Брэдфард",
+            "name:en": "Bradford",
+            "name:hu": "Bradford",
+            "name:ja": "ブラッドフォード",
+            "name:ko": "브래드퍼드",
+            "name:lt": "Bradfordas",
+            "name:mk": "Брадфорд",
+            "name:ru": "Брэдфорд",
+            "name:sr": "Бредфорд",
+            "name:uk": "Бредфорд",
+            "place": "city",
+            "population": "293717",
+            "wikidata": "Q22905",
+            "wikipedia": "en:Bradford"
+        },
+        "type": "Feature"
+    }
+}

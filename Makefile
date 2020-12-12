@@ -113,7 +113,9 @@ build.package.deploy: release package deploy
 
 # TEST
 test.lambda.value:
-	@$(AWS_CLI) lambda invoke --function-name store_value-$(STAGE) --invocation-type=RequestResponse --payload $(shell echo '{ "key": "Key Object", "value": { "valString": "Sub Value 1", "valNumber": 1, "valBool": true, "valObj": { "valString": "Sub Value 2" }, "valArray": [ { "valArray": ["Sub Array 1", "Sub Array 2"] }, "some array string", 1, true ] }}' | $(BASE64)) out.json | cat
+	@curl -X POST https://9owe8xkh0i.execute-api.eu-central-1.amazonaws.com/dev -d "@./etc/london.json"
+	@curl -X POST https://9owe8xkh0i.execute-api.eu-central-1.amazonaws.com/dev -d "@./etc/leeds.json"
+	@curl -X POST https://9owe8xkh0i.execute-api.eu-central-1.amazonaws.com/dev -d "@./etc/bradford.json"
 
 test.lambda.retrieve.value:
 	@$(AWS_CLI) lambda invoke --function-name retrieve_value-$(STAGE) --invocation-type=RequestResponse --payload $(shell echo '{ "key": "Key Object" }' | $(BASE64)) out.json | cat

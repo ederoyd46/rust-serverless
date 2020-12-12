@@ -682,7 +682,6 @@ dependencies = [
 name = "lambdas"
 version = "0.2.0"
 dependencies = [
- "lambda",
  "lambda_http",
  "lib",
  "log",

@@ -1,15 +1,12 @@
-// #[cfg(feature = "with-lambda")]
-// use lambda::{lambda, Context};
-use lib::database::{get_db_client, store_database_item};
-use lib::error_and_panic;
-use lib::logger::initialise_logger;
-use lib::types::{CustomOutput, CustomValue, Error, Storable};
-
 #[cfg(feature = "with-lambda")]
 use lambda_http::{
     lambda::{lambda, Context},
     Body, IntoResponse, Request,
 };
+use lib::database::{get_db_client, store_database_item};
+use lib::error_and_panic;
+use lib::logger::initialise_logger;
+use lib::types::{CustomOutput, CustomValue, Error, Storable};
 
 use log::{debug, error, info};
 
