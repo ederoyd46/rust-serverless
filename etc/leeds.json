@@ -8,6 +8,7 @@
             ],
             "type": "Point"
         },
+        "test_number": 12,
         "properties": {
             "alt_name:la": "Leodis;Loidis",
             "is_capital": "county",

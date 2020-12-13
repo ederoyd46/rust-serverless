@@ -8,3 +8,4 @@ stack.json
 *.tfstate*
 deploy
 out.json
+.terraform.lock.hcl
