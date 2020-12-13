@@ -55,7 +55,7 @@ fn build_serde_value(attribute: &AttributeValue) -> Value {
         Value::String(val.to_string())
     } else if attribute.n.is_some() {
         let val = attribute.n.as_ref().unwrap();
-        Value::Number(Number::from(val.parse::<i64>().unwrap()))
+        Value::Number(Number::from_f64(val.parse::<f64>().unwrap()).unwrap()) // TODO Need to handle i64 and f64
     } else if attribute.bool.is_some() {
         let val = attribute.bool.unwrap();
         Value::Bool(val)

@@ -10,7 +10,7 @@ USE_LOCAL_AWS=false
 AWS_CLI_VERSION=2.1.4
 
 USE_LOCAL_TERRAFORM=false
-TERRAFORM_VERSION=0.13.5
+TERRAFORM_VERSION=0.14.2
 
 # Use Docker to Cross compile Linux Binaries (this can be slow)
 USE_DOCKER_CROSS_COMPILE=false
@@ -113,12 +113,18 @@ build.package.deploy: release package deploy
 
 # TEST
 test.lambda.value:
-	@curl -X POST https://9owe8xkh0i.execute-api.eu-central-1.amazonaws.com/dev -d "@./etc/london.json"
-	@curl -X POST https://9owe8xkh0i.execute-api.eu-central-1.amazonaws.com/dev -d "@./etc/leeds.json"
-	@curl -X POST https://9owe8xkh0i.execute-api.eu-central-1.amazonaws.com/dev -d "@./etc/bradford.json"
+	@API_URL=$(shell $(TERRAFORM) output base_url); \
+	for place in leeds bradford london; \
+	do \
+		curl -X POST $$API_URL/store -d "@./etc/$$place.json"; \
+	done;
 
 test.lambda.retrieve.value:
-	@$(AWS_CLI) lambda invoke --function-name retrieve_value-$(STAGE) --invocation-type=RequestResponse --payload $(shell echo '{ "key": "Key Object" }' | $(BASE64)) out.json | cat
+	@API_URL=$(shell $(TERRAFORM) output base_url); \
+	for i in Leeds Bradford London; \
+	do \
+		curl -X POST $$API_URL/retrieve -d '{"key": "'$$i'"}'; \
+	done;
 
 test.local.value:
 	@for i in 1; \
