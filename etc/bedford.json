@@ -1,0 +1,26 @@
+{
+    "key": "Bedford",
+    "value": {
+        "geometry": {
+            "coordinates": [
+                -0.4675041,
+                52.1363806
+            ],
+            "type": "Point"
+        },
+        "properties": {
+            "is_in": "Bedfordshire",
+            "is_in:country": "United Kingdom",
+            "is_in:country_code": "GB",
+            "is_in:county": "Bedfordshire",
+            "name": "Bedford",
+            "name:lt": "Bedfordas",
+            "name:ru": "Бедфорд",
+            "place": "town",
+            "population": "80000",
+            "wikidata": "Q208257",
+            "wikipedia": "en:Bedford"
+        },
+        "type": "Feature"
+    }
+}

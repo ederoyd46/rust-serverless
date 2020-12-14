@@ -3,6 +3,10 @@ use lambda_http::{
     lambda::{lambda, Context},
     Body, IntoResponse, Request,
 };
+
+#[cfg(feature = "with-lambda")]
+use serde_json::Value;
+
 use lib::database::{get_db_client, store_database_item};
 use lib::error_and_panic;
 use lib::logger::initialise_logger;
@@ -15,15 +19,23 @@ use std::env;
 #[cfg(feature = "with-lambda")]
 #[lambda(http)]
 #[tokio::main]
-async fn main(event: Request, _: Context) -> Result<impl IntoResponse, Error> {
+async fn main(event: Request, _context: Context) -> Result<impl IntoResponse, Error> {
     let body = match event.body() {
         Body::Text(val) => val.as_ref(),
         _ => error_and_panic!("Invalid input, please use a string"), // Currently we only accept text
     };
 
-    let input: CustomValue = match serde_json::from_str(body) {
+    let value: Value = match serde_json::from_str(body) {
         Ok(item) => item,
         Err(e) => error_and_panic!("Could not parse input to known type", e),
+    };
+
+    let path: Vec<&str> = event.uri().path().rsplit('/').collect();
+    let key: &str = path.into_iter().nth(0).unwrap();
+
+    let input = CustomValue {
+        key: key.to_string(),
+        value: value,
     };
 
     match handler(input).await {

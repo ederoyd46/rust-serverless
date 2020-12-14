@@ -114,14 +114,17 @@ build.package.deploy: release package deploy
 # TEST
 test.lambda.value:
 	@API_URL=$(shell $(TERRAFORM) output base_url); \
-	for place in leeds bradford london; \
+	FILES="$(shell ls ./etc)"; \
+	echo $$FILES; \
+	for f in $$FILES; \
 	do \
-		curl -X POST $$API_URL/store -d "@./etc/$$place.json"; \
+		curl -X POST "$$API_URL/store/$$f" -d "@./etc/$$f"; \
 	done;
 
 test.lambda.retrieve.value:
 	@API_URL=$(shell $(TERRAFORM) output base_url); \
-	for i in Leeds Bradford London; \
+	FILES="$(shell ls ./etc)"; \
+	for i in $$FILES; \
 	do \
 		curl -X POST $$API_URL/retrieve -d '{"key": "'$$i'"}'; \
 	done;

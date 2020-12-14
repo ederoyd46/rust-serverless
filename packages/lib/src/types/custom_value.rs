@@ -7,11 +7,11 @@ use super::{Retrievable, Storable};
 
 #[derive(Deserialize, Serialize, Debug)]
 pub struct CustomValue {
-    #[serde(rename = "key")]
-    key: String,
+    // #[serde(rename = "key")]
+    pub key: String,
 
-    #[serde(rename = "value")]
-    value: Value,
+    // #[serde(rename = "value")]
+    pub value: Value,
 }
 
 impl CustomValue {
