@@ -4,7 +4,6 @@ use lambda_http::{
     Body, IntoResponse, Request,
 };
 
-#[cfg(feature = "with-lambda")]
 use serde_json::Value;
 
 use lib::database::{get_db_client, store_database_item};
@@ -13,6 +12,9 @@ use lib::logger::initialise_logger;
 use lib::types::{CustomOutput, CustomValue, Error, Storable};
 
 use log::{debug, error, info};
+
+#[cfg(not(feature = "with-lambda"))]
+use std::fs::read_to_string;
 
 use std::env;
 
@@ -31,11 +33,11 @@ async fn main(event: Request, _context: Context) -> Result<impl IntoResponse, Er
     };
 
     let path: Vec<&str> = event.uri().path().rsplit('/').collect();
-    let key: &str = path.into_iter().nth(0).unwrap();
+    let key: &str = path.into_iter().next().unwrap();
 
     let input = CustomValue {
         key: key.to_string(),
-        value: value,
+        value,
     };
 
     match handler(input).await {
@@ -47,15 +49,26 @@ async fn main(event: Request, _context: Context) -> Result<impl IntoResponse, Er
 #[cfg(not(feature = "with-lambda"))]
 #[tokio::main]
 async fn main() -> Result<(), Error> {
-    let input_str = std::env::args().nth(1);
-
-    if input_str.is_none() {
-        panic!("You must pass a JSON string input parameter as the first argument");
+    let key_str = std::env::args().nth(1);
+    if key_str.is_none() {
+        panic!("You must pass a Key input parameter as the first argument");
     }
 
-    let input: CustomValue = match serde_json::from_str(&input_str.unwrap()) {
+    let path_str = std::env::args().nth(2);
+    if path_str.is_none() {
+        panic!("You must pass a Path parameter as the second argument");
+    }
+
+    let value_str = read_to_string(path_str.unwrap());
+
+    let value: Value = match serde_json::from_str(&value_str.unwrap()) {
         Ok(item) => item,
         Err(e) => error_and_panic!("Could not parse input to known type", e),
+    };
+
+    let input = CustomValue {
+        key: key_str.unwrap(),
+        value,
     };
 
     let output = handler(input).await?;

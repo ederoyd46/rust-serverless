@@ -130,24 +130,17 @@ test.lambda.retrieve.value:
 	done;
 
 test.local.value:
-	@for i in 1; \
+	FILES="$(shell ls ./etc)"; \
+	for f in $$FILES; \
 	do \
-		DATABASE=$(DATA_STORE_NAME) cargo run --bin store_value -- '{"key": "Key Object '$$i'", "value": { "valString": "Sub Value 1", "valNumber": 1, "valBool": true, "valObj": { "valString": "Sub Value 2" }, "valArray": [ { "valArray": ["Sub Array 1", "Sub Array 2"] }, "some array string", 1, true ] }}'; \
-		DATABASE=$(DATA_STORE_NAME) cargo run --bin store_value -- '{"key": "Key Array '$$i'", "value": ["val 1","val 2"]}'; \
-		DATABASE=$(DATA_STORE_NAME) cargo run --bin store_value -- '{"key": "Key Bool '$$i'", "value": true}'; \
-		DATABASE=$(DATA_STORE_NAME) cargo run --bin store_value -- '{"key": "Key Number '$$i'", "value": 1}'; \
-		DATABASE=$(DATA_STORE_NAME) cargo run --bin store_value -- '{"key": "Key String '$$i'", "value": "Value"}'; \
+		DATABASE=$(DATA_STORE_NAME) cargo run --bin store_value -- $$f ./etc/$$f; \
 	done;
 
-
 test.local.retrieve.value:
-	@for i in 1; \
+	FILES="$(shell ls ./etc)"; \
+	for f in $$FILES; \
 	do \
-		DATABASE=$(DATA_STORE_NAME) cargo run --bin retrieve_value -- '{"key": "Key Object '$$i'"}'; \
-		DATABASE=$(DATA_STORE_NAME) cargo run --bin retrieve_value -- '{"key": "Key Array '$$i'"}'; \
-		DATABASE=$(DATA_STORE_NAME) cargo run --bin retrieve_value -- '{"key": "Key Bool '$$i'"}'; \
-		DATABASE=$(DATA_STORE_NAME) cargo run --bin retrieve_value -- '{"key": "Key Number '$$i'"}'; \
-		DATABASE=$(DATA_STORE_NAME) cargo run --bin retrieve_value -- '{"key": "Key String '$$i'"}'; \
+		DATABASE=$(DATA_STORE_NAME) cargo run --bin retrieve_value -- '{"key": "'$$f'"}'; \
 	done;
 
 # Table tasks (Local Only)
@@ -156,6 +149,9 @@ table.list:
 
 table.scan:
 	@$(AWS_CLI) dynamodb scan --table-name $(DATA_STORE_NAME) $(ENDPOINT)
+
+table.get:
+	@$(AWS_CLI) dynamodb get-item --table-name $(DATA_STORE_NAME) --key '{"PK": {"S": "$(KEY)"}}' $(ENDPOINT)
 
 table.create:
 	@$(AWS_CLI) dynamodb create-table --table-name $(DATA_STORE_NAME) \
