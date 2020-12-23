@@ -150,6 +150,7 @@ table.list:
 table.scan:
 	@$(AWS_CLI) dynamodb scan --table-name $(DATA_STORE_NAME) $(ENDPOINT)
 
+# e.g make table.get KEY="bedford.json"
 table.get:
 	@$(AWS_CLI) dynamodb get-item --table-name $(DATA_STORE_NAME) --key '{"PK": {"S": "$(KEY)"}}' $(ENDPOINT)
 
