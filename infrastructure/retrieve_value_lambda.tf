@@ -24,22 +24,10 @@ resource aws_cloudwatch_log_group retrieve_value {
 }
 
 # API Gateway
-
-resource aws_api_gateway_resource retrieve_value {
-   rest_api_id = aws_api_gateway_rest_api.api.id
-   parent_id   = aws_api_gateway_rest_api.api.root_resource_id
-   path_part   = "retrieve"
-}
-resource aws_api_gateway_resource retrieve_value_key {
-   rest_api_id = aws_api_gateway_rest_api.api.id
-   parent_id   = aws_api_gateway_resource.retrieve_value.id
-   path_part   = "{key}"
-}
-
 resource aws_api_gateway_method retrieve_value {
    rest_api_id   = aws_api_gateway_rest_api.api.id
-   resource_id   = aws_api_gateway_resource.retrieve_value_key.id
-   http_method   = "POST"
+   resource_id   = aws_api_gateway_resource.db_key.id
+   http_method   = "GET"
    authorization = "NONE"
 
   request_parameters = {
@@ -52,6 +40,7 @@ resource aws_api_gateway_integration retrieve_value {
    resource_id = aws_api_gateway_method.retrieve_value.resource_id
    http_method = aws_api_gateway_method.retrieve_value.http_method
 
+  # TODO Does this always need to be a POST even though the API is GET
    integration_http_method = "POST"
    type                    = "AWS_PROXY"
    uri                     = aws_lambda_function.retrieve_value.invoke_arn

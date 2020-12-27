@@ -23,23 +23,10 @@ resource aws_cloudwatch_log_group store_value {
   retention_in_days = 3
 }
 
-
 # API Gateway
-
-resource aws_api_gateway_resource store_value {
-   rest_api_id = aws_api_gateway_rest_api.api.id
-   parent_id   = aws_api_gateway_rest_api.api.root_resource_id
-   path_part   = "store"
-}
-resource aws_api_gateway_resource store_value_key {
-   rest_api_id = aws_api_gateway_rest_api.api.id
-   parent_id   = aws_api_gateway_resource.store_value.id
-   path_part   = "{key}"
-}
-
 resource aws_api_gateway_method store_value {
    rest_api_id   = aws_api_gateway_rest_api.api.id
-   resource_id   = aws_api_gateway_resource.store_value_key.id
+   resource_id   = aws_api_gateway_resource.db_key.id
    http_method   = "POST"
    authorization = "NONE"
 

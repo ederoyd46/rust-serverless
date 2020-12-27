@@ -118,7 +118,7 @@ test.lambda.store.value:
 	echo $$FILES; \
 	for f in $$FILES; \
 	do \
-		curl -X POST "$$API_URL/store/$$f" -d "@./etc/$$f"; \
+		curl -X POST "$$API_URL/db/$$f" -d "@./etc/$$f"; \
 	done;
 
 test.lambda.retrieve.value:
@@ -126,7 +126,7 @@ test.lambda.retrieve.value:
 	FILES="$(shell ls ./etc)"; \
 	for i in $$FILES; \
 	do \
-		curl -X POST $$API_URL/retrieve/$$i; \
+		curl -X GET $$API_URL/db/$$i; \
 	done;
 
 test.local.store.value:
