@@ -69,10 +69,7 @@ resource aws_lambda_permission store_value {
    source_arn = "${aws_api_gateway_rest_api.api.execution_arn}/*/*"
 }
 
-
 # Outputs
-
-
 output store_value_lambda {
   value = aws_lambda_function.store_value.arn
 }

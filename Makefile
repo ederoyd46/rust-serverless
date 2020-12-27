@@ -126,7 +126,7 @@ test.lambda.retrieve.value:
 	FILES="$(shell ls ./etc)"; \
 	for i in $$FILES; \
 	do \
-		curl -X POST $$API_URL/retrieve -d '{"key": "'$$i'"}'; \
+		curl -X POST $$API_URL/retrieve/$$i; \
 	done;
 
 test.local.store.value:

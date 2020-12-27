@@ -16,7 +16,7 @@ pub async fn retrieve_database_item(
         ..Default::default()
     };
 
-    debug!("About to get from DynamoDB");
+    debug!("About to get from DynamoDB {:?}", get_item);
     let item_from_dynamo = match client.get_item(get_item).await {
         Ok(item) => item,
         Err(e) => error_and_panic!("Error completing read to database", e)
