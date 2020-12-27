@@ -1,11 +1,14 @@
 #[cfg(feature = "with-lambda")]
+mod common;
+
+#[cfg(feature = "with-lambda")]
 use lambda_http::{
     lambda::{lambda, Context},
     IntoResponse, Request,
 };
-#[cfg(not(feature = "with-lambda"))]
-use std::io::{Write, stdout};
 
+#[cfg(not(feature = "with-lambda"))]
+use std::io::{stdout, Write};
 
 use serde_json::Value;
 
@@ -16,7 +19,6 @@ use lib::logger::initialise_logger;
 use lib::types::{CustomRetrieveValue, CustomValue, Error, Retrievable};
 
 use log::{debug, error};
-
 use std::env;
 
 #[cfg(feature = "with-lambda")]
@@ -24,12 +26,9 @@ use std::env;
 #[tokio::main]
 async fn main(event: Request, _: Context) -> Result<impl IntoResponse, Error> {
     debug!("Retrieve: {:?}", event);
-    let path: Vec<&str> = event.uri().path().rsplit('/').collect();
-    let key: &str = path.into_iter().next().unwrap();
+    let key = common::extract_key_from_request(event);
 
-    let input = CustomRetrieveValue {
-        key: key.to_string()
-    };
+    let input = CustomRetrieveValue { key };
 
     match handler(input).await {
         Ok(val) => Ok(val),
@@ -47,7 +46,7 @@ async fn main() -> Result<(), Error> {
     }
 
     let input = CustomRetrieveValue {
-        key: key_str.unwrap()
+        key: key_str.unwrap(),
     };
 
     let output = handler(input).await?;
