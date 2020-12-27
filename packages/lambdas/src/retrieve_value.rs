@@ -3,6 +3,9 @@ use lambda_http::{
     lambda::{lambda, Context},
     Body, IntoResponse, Request,
 };
+#[cfg(not(feature = "with-lambda"))]
+use std::io::{Write, stdout};
+
 
 use serde_json::Value;
 
@@ -40,16 +43,18 @@ async fn main(event: Request, _: Context) -> Result<impl IntoResponse, Error> {
 #[cfg(not(feature = "with-lambda"))]
 #[tokio::main]
 async fn main() -> Result<(), Error> {
-    let input_str = std::env::args().nth(1);
+    let key_str = std::env::args().nth(1);
 
-    if input_str.is_none() {
+    if key_str.is_none() {
         error_and_panic!("You must pass a key input parameter as the first argument");
     }
 
-    let input: CustomRetrieveValue = serde_json::from_str(&input_str.unwrap())?;
-    let output = handler(input).await?;
-    debug!("{}", output.to_string());
+    let input = CustomRetrieveValue {
+        key: key_str.unwrap()
+    };
 
+    let output = handler(input).await?;
+    stdout().write_all(output.to_string().as_bytes()).unwrap();
     Ok(())
 }
 
@@ -60,6 +65,5 @@ async fn handler(key: CustomRetrieveValue) -> Result<Value, Error> {
 
     let item_from_dynamo = retrieve_database_item(&table_name, &key, get_db_client()?).await;
     let retrieved_item = CustomValue::from_dynamo_db(item_from_dynamo.item.unwrap()).unwrap();
-    debug!("Retrieved Item {:?}", retrieved_item);
     Ok(retrieved_item.value().clone())
 }

@@ -139,9 +139,9 @@ Remove Terraform resources.
 make remove
 ```
 
-Test Local Value Lambda.
+Test Local Store Value Lambda.
 ```sh
-make test.local.value
+make test.local.store.value
 ```
 
 Test Local Retrieve Value Lambda.
@@ -149,9 +149,9 @@ Test Local Retrieve Value Lambda.
 make test.local.retrieve.value
 ```
 
-Test AWS Value Lambda.
+Test AWS Store Value Lambda.
 ```sh
-make test.lambda.value
+make test.lambda.store.value
 ```
 
 Test AWS Retrieve Value Lambda.

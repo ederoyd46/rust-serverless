@@ -112,7 +112,7 @@ build.package.deploy: release package deploy
 
 
 # TEST
-test.lambda.value:
+test.lambda.store.value:
 	@API_URL=$(shell $(TERRAFORM) output base_url); \
 	FILES="$(shell ls ./etc)"; \
 	echo $$FILES; \
@@ -129,7 +129,7 @@ test.lambda.retrieve.value:
 		curl -X POST $$API_URL/retrieve -d '{"key": "'$$i'"}'; \
 	done;
 
-test.local.value:
+test.local.store.value:
 	FILES="$(shell ls ./etc)"; \
 	for f in $$FILES; \
 	do \
@@ -140,7 +140,7 @@ test.local.retrieve.value:
 	FILES="$(shell ls ./etc)"; \
 	for f in $$FILES; \
 	do \
-		DATABASE=$(DATA_STORE_NAME) cargo run --bin retrieve_value -- '{"key": "'$$f'"}'; \
+		DATABASE=$(DATA_STORE_NAME) cargo run --bin retrieve_value -- $$f; \
 	done;
 
 # Table tasks (Local Only)
