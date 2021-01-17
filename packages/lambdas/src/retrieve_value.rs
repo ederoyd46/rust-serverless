@@ -58,5 +58,5 @@ async fn handler(key: CustomRetrieveValue) -> Result<Value, Error> {
 
     let item_from_dynamo = retrieve_database_item(&table_name, &key, get_db_client()?).await;
     let retrieved_item = CustomValue::from_dynamo_db(item_from_dynamo.item.unwrap()).unwrap();
-    Ok(retrieved_item.value().clone())
+    Ok(retrieved_item.value().clone()) //TODO Can I get rid of this clone?
 }

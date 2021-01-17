@@ -93,11 +93,11 @@ fn build_attribute_value(value: &Value) -> AttributeValue {
             ..Default::default()
         },
         Value::Object(val) => AttributeValue {
-            m: Some(build_dynamodb_object(val.clone())),
+            m: Some(build_dynamodb_object(&val)),
             ..Default::default()
         },
         Value::Array(val) => AttributeValue {
-            l: Some(build_dynamodb_array(val.clone())),
+            l: Some(build_dynamodb_array(&val)),
             ..Default::default()
         },
         Value::Null => AttributeValue {
@@ -107,14 +107,14 @@ fn build_attribute_value(value: &Value) -> AttributeValue {
     }
 }
 
-fn build_dynamodb_object(object: Map<String, Value>) -> HashMap<String, AttributeValue> {
+fn build_dynamodb_object(object: &Map<String, Value>) -> HashMap<String, AttributeValue> {
     object
         .iter()
         .map(|(k, v)| (k.to_string(), build_attribute_value(v)))
         .collect()
 }
 
-fn build_dynamodb_array(object: Vec<Value>) -> Vec<AttributeValue> {
+fn build_dynamodb_array(object: &[Value]) -> Vec<AttributeValue> {
     object.iter().map(|v| build_attribute_value(v)).collect()
 }
 
