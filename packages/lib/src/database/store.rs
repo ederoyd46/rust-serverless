@@ -1,16 +1,18 @@
 use log::{self, debug, error};
 use rusoto_dynamodb::AttributeValue;
-use rusoto_dynamodb::{DynamoDb, DynamoDbClient, PutItemInput, PutItemOutput};
+use rusoto_dynamodb::{DynamoDb, DynamoDbClient, PutItemInput, PutItemOutput, PutItemError};
+use rusoto_core::RusotoError;
 use std::collections::HashMap;
-use crate::error_and_panic;
+use crate::log_and_throw;
 
 use crate::types::Storable;
+
 
 pub async fn store_database_item(
     table_name: &str,
     data: &impl Storable,
     client: &DynamoDbClient,
-) -> PutItemOutput {
+) -> Result<PutItemOutput, RusotoError<PutItemError>> {
     let put_item = PutItemInput {
         item: build_dynamo_db_map(data),
         table_name: table_name.to_string(),
@@ -20,12 +22,11 @@ pub async fn store_database_item(
     debug!("About to update DynamoDB");
     let item_from_dynamo = match client.put_item(put_item).await {
         Ok(item) => item,
-        Err(e) => error_and_panic!("Error completing write to database: {}", e)
-
+        Err(e) => log_and_throw!("Error completing write to database: {}", e)
     };
     debug!("Updated DynamoDB");
 
-    item_from_dynamo
+    Ok(item_from_dynamo)
 }
 
 fn build_dynamo_db_map(data: &impl Storable) -> HashMap<String, AttributeValue> {

@@ -80,7 +80,7 @@ async fn handler<T: Storable>(event: T) -> Result<CustomOutput, Error> {
         error_and_panic!("No key specified");
     }
 
-    let item_from_dynamo = store_database_item(&table_name, &event, get_db_client()?).await;
+    let item_from_dynamo = store_database_item(&table_name, &event, get_db_client()?).await?;
 
     info!("item: {:?}", item_from_dynamo);
 
