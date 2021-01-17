@@ -8,7 +8,7 @@ use crate::types::Storable;
 
 pub async fn store_database_item(
     table_name: &str,
-    data: &dyn Storable,
+    data: &impl Storable,
     client: &DynamoDbClient,
 ) -> PutItemOutput {
     let put_item = PutItemInput {
@@ -28,7 +28,7 @@ pub async fn store_database_item(
     item_from_dynamo
 }
 
-fn build_dynamo_db_map(data: &dyn Storable) -> HashMap<String, AttributeValue> {
+fn build_dynamo_db_map(data: &impl Storable) -> HashMap<String, AttributeValue> {
     let mut item = HashMap::new();
     item.insert(
         "PK".to_string(),
