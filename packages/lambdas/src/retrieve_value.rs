@@ -1,7 +1,4 @@
 #[cfg(feature = "with-lambda")]
-mod common;
-
-#[cfg(feature = "with-lambda")]
 use lambda_http::{
     lambda::{lambda, Context},
     IntoResponse, Request,
@@ -26,7 +23,7 @@ use std::env;
 #[tokio::main]
 async fn main(event: Request, _: Context) -> Result<impl IntoResponse, Error> {
     debug!("Retrieve: {:?}", event);
-    let key = common::extract_key_from_request(event);
+    let key = lambdas::extract_key_from_request(event);
 
     let input = CustomRetrieveValue { key };
 

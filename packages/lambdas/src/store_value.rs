@@ -1,7 +1,4 @@
 #[cfg(feature = "with-lambda")]
-mod common;
-
-#[cfg(feature = "with-lambda")]
 use lambda_http::{
     lambda::{lambda, Context},
     Body, IntoResponse, Request,
@@ -35,7 +32,7 @@ async fn main(event: Request, _context: Context) -> Result<impl IntoResponse, Er
         Err(e) => error_and_panic!("Could not parse input to known type", e),
     };
 
-    let key = common::extract_key_from_request(event);
+    let key = lambdas::extract_key_from_request(event);
     let input = CustomValue { key, value };
 
     match handler(input).await {
