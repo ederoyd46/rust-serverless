@@ -6,23 +6,31 @@ use once_cell::sync::OnceCell;
 use rusoto_core::Region;
 use rusoto_dynamodb::DynamoDbClient;
 
+#[cfg(not(feature = "with-lambda"))]
+const LOCAL_ENDPOINT: &str = "http://localhost:8000";
+
+#[cfg(not(feature = "with-lambda"))]
+const LOCAL_REGION: &str = "eu-central-1";
+
 static DB_CLIENT: OnceCell<DynamoDbClient> = OnceCell::new();
 
 pub fn get_db_client() -> Result<&'static DynamoDbClient, Error> {
-    #[cfg(feature = "with-lambda")]
-    let region = Region::EuCentral1;
-
-    #[cfg(not(feature = "with-lambda"))]
-    let region = Region::Custom {
-        name: "eu-central-1".to_owned(),
-        endpoint: "http://localhost:8000".to_owned(),
-    };
-
     if DB_CLIENT.get().is_none() {
         debug!("About to create a client");
-        let client = DynamoDbClient::new(region);
-        assert_eq!(DB_CLIENT.set(client).is_err(), false);
+        let client = DynamoDbClient::new(get_region());
+        assert_eq!(DB_CLIENT.set(client).is_err(), false); //TODO Do we really need this?
         debug!("Created a client");
     }
     Ok(DB_CLIENT.get().unwrap())
+}
+
+fn get_region() -> Region {
+    #[cfg(feature = "with-lambda")]
+    return Region::EuCentral1;
+
+    #[cfg(not(feature = "with-lambda"))]
+    Region::Custom {
+        name: LOCAL_REGION.to_string(),
+        endpoint: LOCAL_ENDPOINT.to_string(),
+    }
 }
