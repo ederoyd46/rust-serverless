@@ -47,13 +47,13 @@ async fn main() -> Result<(), Error> {
     };
 
     let output = handler(input).await?;
-    stdout().write_all(output.to_string().as_bytes()).unwrap();
+    stdout().write_all(output.to_string().as_bytes())?;
     Ok(())
 }
 
 async fn handler(key: CustomRetrieveValue) -> Result<Value, Error> {
     initialise_logger()?;
-    let table_name = env::var("DATABASE").unwrap();
+    let table_name = env::var("DATABASE")?;
     debug!("Database table is {}", table_name);
 
     let item_from_dynamo = retrieve_database_item(&table_name, &key, get_db_client()?).await?;
