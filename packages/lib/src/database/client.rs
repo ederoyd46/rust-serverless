@@ -30,7 +30,7 @@ fn get_region() -> Region {
 
     #[cfg(not(feature = "with-lambda"))]
     Region::Custom {
-        name: LOCAL_REGION.to_string(),
-        endpoint: LOCAL_ENDPOINT.to_string(),
+        name: LOCAL_REGION.to_owned(),
+        endpoint: LOCAL_ENDPOINT.to_owned(),
     }
 }
