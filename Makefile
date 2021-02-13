@@ -7,10 +7,10 @@ HOSTNAME=$(shell hostname)
 ENDPOINT=--endpoint-url http://$(HOSTNAME):8000
 
 USE_LOCAL_AWS=false
-AWS_CLI_VERSION=2.1.14
+AWS_CLI_VERSION=2.1.26
 
 USE_LOCAL_TERRAFORM=false
-TERRAFORM_VERSION=0.14.3
+TERRAFORM_VERSION=0.14.6
 
 # Use Docker to Cross compile Linux Binaries (this can be slow)
 USE_DOCKER_CROSS_COMPILE=false
