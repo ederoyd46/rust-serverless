@@ -1,6 +1,5 @@
 use crate::types::Error;
 
-use log::debug;
 use once_cell::sync::OnceCell;
 
 use rusoto_core::Region;
@@ -15,13 +14,7 @@ const LOCAL_REGION: &str = "eu-central-1";
 static DB_CLIENT: OnceCell<DynamoDbClient> = OnceCell::new();
 
 pub fn get_db_client() -> Result<&'static DynamoDbClient, Error> {
-    if DB_CLIENT.get().is_none() {
-        debug!("About to create a client");
-        let client = DynamoDbClient::new(get_region());
-        assert_eq!(DB_CLIENT.set(client).is_err(), false); //TODO Do we really need this?
-        debug!("Created a client");
-    }
-    Ok(DB_CLIENT.get().unwrap())
+    Ok(DB_CLIENT.get_or_init(|| DynamoDbClient::new(get_region())))
 }
 
 fn get_region() -> Region {
@@ -30,7 +23,7 @@ fn get_region() -> Region {
 
     #[cfg(not(feature = "with-lambda"))]
     Region::Custom {
-        name: LOCAL_REGION.to_owned(),
-        endpoint: LOCAL_ENDPOINT.to_owned(),
+        name: LOCAL_REGION.to_string(),
+        endpoint: LOCAL_ENDPOINT.to_string(),
     }
 }
