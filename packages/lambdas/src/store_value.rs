@@ -18,6 +18,25 @@ use std::fs::read_to_string;
 
 use std::env;
 
+async fn handler<T: Storable>(event: T) -> Result<CustomOutput, Error> {
+    initialise_logger()?;
+    let table_name = env::var("DATABASE").unwrap();
+    debug!("Database table is {}", table_name);
+
+    if !event.is_valid() {
+        error_and_panic!("No key specified");
+    }
+
+    let item_from_dynamo = store_database_item(&table_name, &event, get_db_client()?).await?;
+
+    info!("item: {:?}", item_from_dynamo);
+
+    Ok(CustomOutput {
+        body: format!("Stored, {}!", event.get_pk()),
+        status: 200,
+    })
+}
+
 #[cfg(feature = "with-lambda")]
 #[lambda(http)]
 #[tokio::main]
@@ -71,24 +90,6 @@ async fn main() -> Result<(), Error> {
     Ok(())
 }
 
-async fn handler<T: Storable>(event: T) -> Result<CustomOutput, Error> {
-    initialise_logger()?;
-    let table_name = env::var("DATABASE").unwrap();
-    debug!("Database table is {}", table_name);
-
-    if !event.is_valid() {
-        error_and_panic!("No key specified");
-    }
-
-    let item_from_dynamo = store_database_item(&table_name, &event, get_db_client()?).await?;
-
-    info!("item: {:?}", item_from_dynamo);
-
-    Ok(CustomOutput {
-        body: format!("Stored, {}!", event.get_pk()),
-        status: 200,
-    })
-}
 
 // #[cfg(test)]
 // mod tests {

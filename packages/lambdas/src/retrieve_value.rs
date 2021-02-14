@@ -18,6 +18,16 @@ use lib::types::{CustomRetrieveValue, CustomValue, Error, Retrievable};
 use log::{debug, error};
 use std::env;
 
+async fn handler(key: CustomRetrieveValue) -> Result<Value, Error> {
+    initialise_logger()?;
+    let table_name = env::var("DATABASE")?;
+    debug!("Database table is {}", table_name);
+
+    let item_from_dynamo = retrieve_database_item(&table_name, &key, get_db_client()?).await?;
+    let retrieved_item = CustomValue::from_dynamo_db(item_from_dynamo.item.unwrap()).unwrap();
+    Ok(retrieved_item.value().to_owned())
+}
+
 #[cfg(feature = "with-lambda")]
 #[lambda(http)]
 #[tokio::main]
@@ -32,6 +42,7 @@ async fn main(event: Request, _: Context) -> Result<impl IntoResponse, Error> {
         Err(e) => error_and_panic!("Could not retrieve data", e),
     }
 }
+
 
 #[cfg(not(feature = "with-lambda"))]
 #[tokio::main]
@@ -51,12 +62,3 @@ async fn main() -> Result<(), Error> {
     Ok(())
 }
 
-async fn handler(key: CustomRetrieveValue) -> Result<Value, Error> {
-    initialise_logger()?;
-    let table_name = env::var("DATABASE")?;
-    debug!("Database table is {}", table_name);
-
-    let item_from_dynamo = retrieve_database_item(&table_name, &key, get_db_client()?).await?;
-    let retrieved_item = CustomValue::from_dynamo_db(item_from_dynamo.item.unwrap()).unwrap();
-    Ok(retrieved_item.value().to_owned())
-}

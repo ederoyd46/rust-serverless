@@ -9,3 +9,4 @@ stack.json
 deploy
 out.json
 .terraform.lock.hcl
+.idea
