@@ -1,7 +1,7 @@
 #[cfg(feature = "with-lambda")]
 use lambda_http::{
-    lambda::{lambda, Context},
-    IntoResponse, Request,
+    handler,
+    lambda::{self},
 };
 
 #[cfg(not(feature = "with-lambda"))]
@@ -9,16 +9,20 @@ use std::io::{stdout, Write};
 
 use serde_json::Value;
 
-use lib::error_and_panic;
-
 use lib::database::{get_db_client, retrieve_database_item};
 use lib::logger::initialise_logger;
 use lib::types::{CustomRetrieveValue, CustomValue, Error, Retrievable};
 
-use log::{debug, error};
+use log::debug;
 use std::env;
 
-async fn handler(key: CustomRetrieveValue) -> Result<Value, Error> {
+#[cfg(not(feature = "with-lambda"))]
+use log::error;
+
+#[cfg(not(feature = "with-lambda"))]
+use lib::error_and_panic;
+
+async fn retrieve_handler(key: CustomRetrieveValue) -> Result<Value, Error> {
     initialise_logger()?;
     let table_name = env::var("DATABASE")?;
     debug!("Database table is {}", table_name);
@@ -29,20 +33,16 @@ async fn handler(key: CustomRetrieveValue) -> Result<Value, Error> {
 }
 
 #[cfg(feature = "with-lambda")]
-#[lambda(http)]
 #[tokio::main]
-async fn main(event: Request, _: Context) -> Result<impl IntoResponse, Error> {
-    debug!("Retrieve: {:?}", event);
-    let key = lambdas::extract_key_from_request(event);
-
-    let input = CustomRetrieveValue { key };
-
-    match handler(input).await {
-        Ok(val) => Ok(val),
-        Err(e) => error_and_panic!("Could not retrieve data", e),
-    }
+async fn main() -> Result<(), Error> {
+    lambda::run(handler(|event, _| {
+        let key = lambdas::extract_key_from_request(event);
+        let input = CustomRetrieveValue { key };
+        retrieve_handler(input)
+    }))
+    .await?;
+    Ok(())
 }
-
 
 #[cfg(not(feature = "with-lambda"))]
 #[tokio::main]
@@ -57,8 +57,7 @@ async fn main() -> Result<(), Error> {
         key: key_str.unwrap(),
     };
 
-    let output = handler(input).await?;
+    let output = retrieve_handler(input).await?;
     stdout().write_all(output.to_string().as_bytes())?;
     Ok(())
 }
-
