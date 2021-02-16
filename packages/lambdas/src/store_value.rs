@@ -2,17 +2,20 @@
 use lambda_http::{
     handler,
     lambda::{self},
-    Body, Request
+    Body, Request,
 };
 
 use serde_json::Value;
 
 use lib::database::{get_db_client, store_database_item};
-use lib::error_and_panic;
+use lib::{error_and_panic};
 use lib::logger::initialise_logger;
 use lib::types::{CustomValue, Error, Storable};
 
 use log::{debug, error, info};
+
+#[cfg(not(feature = "with-lambda"))]
+use lib::{log_and_exit};
 
 #[cfg(not(feature = "with-lambda"))]
 use std::fs::read_to_string;
@@ -50,7 +53,8 @@ async fn main() -> Result<(), Error> {
         let key = lambdas::extract_key_from_request(event);
         let input = CustomValue { key, value };
         handle_store(input)
-    })).await?;
+    }))
+    .await?;
     Ok(())
 }
 
@@ -59,12 +63,12 @@ async fn main() -> Result<(), Error> {
 async fn main() -> Result<(), Error> {
     let key_str = std::env::args().nth(1);
     if key_str.is_none() {
-        panic!("You must pass a Key input parameter as the first argument");
+        log_and_exit!("You must pass a Key input parameter as the first argument", 1);
     }
 
     let path_str = std::env::args().nth(2);
     if path_str.is_none() {
-        panic!("You must pass a Path parameter as the second argument");
+        log_and_exit!("You must pass a Path parameter as the second argument", 2);
     }
 
     let value_str = read_to_string(path_str.unwrap());
