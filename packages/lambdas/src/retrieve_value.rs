@@ -11,23 +11,17 @@ use serde_json::Value;
 
 use lib::database::{get_db_client, retrieve_database_item};
 use lib::logger::initialise_logger;
-use lib::types::{CustomRetrieveValue, CustomValue, Error, Retrievable};
-
-use log::debug;
-use std::env;
-
-#[cfg(not(feature = "with-lambda"))]
-use log::error;
+use lib::types::{Config, ConfigBuilder, CustomRetrieveValue, CustomValue, Error, Retrievable};
 
 #[cfg(not(feature = "with-lambda"))]
 use lib::error_and_panic;
 
-async fn retrieve_handler(key: CustomRetrieveValue) -> Result<Value, Error> {
-    initialise_logger()?;
-    let table_name = env::var("DATABASE")?;
-    debug!("Database table is {}", table_name);
+#[cfg(not(feature = "with-lambda"))]
+use log::error;
 
-    let item_from_dynamo = retrieve_database_item(&table_name, &key, get_db_client()?).await?;
+async fn retrieve_handler(config: Config, key: CustomRetrieveValue) -> Result<Value, Error> {
+    let item_from_dynamo =
+        retrieve_database_item(&config.table_name, &key, get_db_client(&config)?).await?;
     let retrieved_item = CustomValue::from_dynamo_db(item_from_dynamo.item.unwrap()).unwrap();
     Ok(retrieved_item.value().to_owned())
 }
@@ -35,10 +29,16 @@ async fn retrieve_handler(key: CustomRetrieveValue) -> Result<Value, Error> {
 #[cfg(feature = "with-lambda")]
 #[tokio::main]
 async fn main() -> Result<(), Error> {
+    initialise_logger()?;
+
     lambda::run(handler(|event, _| {
         let key = lambdas::extract_key_from_request(event);
         let input = CustomRetrieveValue { key };
-        retrieve_handler(input)
+        let config = ConfigBuilder::new()
+            .table_name(lambdas::get_table_name())
+            .build();
+
+        retrieve_handler(config, input)
     }))
     .await?;
     Ok(())
@@ -47,8 +47,14 @@ async fn main() -> Result<(), Error> {
 #[cfg(not(feature = "with-lambda"))]
 #[tokio::main]
 async fn main() -> Result<(), Error> {
-    let key_str = std::env::args().nth(1);
+    initialise_logger()?;
 
+    let config = ConfigBuilder::new()
+        .table_name(lambdas::get_table_name())
+        .aws_sdk_endpoint(Some("http://localhost:8000".to_string()))
+        .build();
+
+    let key_str = std::env::args().nth(1);
     if key_str.is_none() {
         error_and_panic!("You must pass a key input parameter as the first argument");
     }
@@ -57,7 +63,7 @@ async fn main() -> Result<(), Error> {
         key: key_str.unwrap(),
     };
 
-    let output = retrieve_handler(input).await?;
+    let output = retrieve_handler(config, input).await?;
     stdout().write_all(output.to_string().as_bytes())?;
     Ok(())
 }

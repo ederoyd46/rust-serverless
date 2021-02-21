@@ -1,8 +1,10 @@
 mod custom_retrieve_value;
 mod custom_value;
+mod config;
 
 pub use custom_retrieve_value::CustomRetrieveValue;
 pub use custom_value::CustomValue;
+pub use config::*;
 
 use rusoto_dynamodb::AttributeValue;
 use std::collections::HashMap;

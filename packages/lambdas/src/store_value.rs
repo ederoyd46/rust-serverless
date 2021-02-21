@@ -8,30 +8,29 @@ use lambda_http::{
 use serde_json::Value;
 
 use lib::database::{get_db_client, store_database_item};
-use lib::{error_and_panic};
+use lib::error_and_panic;
 use lib::logger::initialise_logger;
-use lib::types::{CustomValue, Error, Storable};
+use lib::types::{Config, ConfigBuilder, CustomValue, Error, Storable};
 
-use log::{debug, error, info};
+use log::{error, info};
 
 #[cfg(not(feature = "with-lambda"))]
-use lib::{log_and_exit};
+use log::{debug};
+
+
+#[cfg(not(feature = "with-lambda"))]
+use lib::log_and_exit;
 
 #[cfg(not(feature = "with-lambda"))]
 use std::fs::read_to_string;
 
-use std::env;
-
-async fn handle_store<T: Storable>(event: T) -> Result<String, Error> {
-    initialise_logger()?;
-    let table_name = env::var("DATABASE").unwrap();
-    debug!("Database table is {}", table_name);
-
+async fn handle_store<T: Storable>(config: Config, event: T) -> Result<String, Error> {
     if !event.is_valid() {
         error_and_panic!("No key specified");
     }
 
-    let item_from_dynamo = store_database_item(&table_name, &event, get_db_client()?).await?;
+    let item_from_dynamo =
+        store_database_item(&config.table_name, &event, get_db_client(&config)?).await?;
 
     info!("item: {:?}", item_from_dynamo);
 
@@ -41,6 +40,8 @@ async fn handle_store<T: Storable>(event: T) -> Result<String, Error> {
 #[cfg(feature = "with-lambda")]
 #[tokio::main]
 async fn main() -> Result<(), Error> {
+    initialise_logger()?;
+
     lambda::run(handler(|event: Request, _| {
         let body = match event.body() {
             Body::Text(val) => val.as_ref(),
@@ -52,7 +53,11 @@ async fn main() -> Result<(), Error> {
         };
         let key = lambdas::extract_key_from_request(event);
         let input = CustomValue { key, value };
-        handle_store(input)
+        let config = ConfigBuilder::new()
+            .table_name(lambdas::get_table_name())
+            .build();
+
+        handle_store(config, input)
     }))
     .await?;
     Ok(())
@@ -61,9 +66,19 @@ async fn main() -> Result<(), Error> {
 #[cfg(not(feature = "with-lambda"))]
 #[tokio::main]
 async fn main() -> Result<(), Error> {
+    initialise_logger()?;
+
+    let config = ConfigBuilder::new()
+        .table_name(lambdas::get_table_name())
+        .aws_sdk_endpoint(Some("http://localhost:8000".to_string()))
+        .build();
+
     let key_str = std::env::args().nth(1);
     if key_str.is_none() {
-        log_and_exit!("You must pass a Key input parameter as the first argument", 1);
+        log_and_exit!(
+            "You must pass a Key input parameter as the first argument",
+            1
+        );
     }
 
     let path_str = std::env::args().nth(2);
@@ -83,7 +98,7 @@ async fn main() -> Result<(), Error> {
         value,
     };
 
-    let output = handle_store(input).await?;
+    let output = handle_store(config, input).await?;
     debug!("{}", output);
     Ok(())
 }
