@@ -1,7 +1,6 @@
 #[cfg(feature = "with-lambda")]
 use lambda_http::{
     handler,
-    lambda::{self},
     Body, Request,
 };
 
@@ -42,7 +41,7 @@ async fn handle_store<T: Storable>(config: Config, event: T) -> Result<String, E
 async fn main() -> Result<(), Error> {
     initialise_logger()?;
 
-    lambda::run(handler(|event: Request, _| {
+    lambda_runtime::run(handler(|event: Request, _| {
         let body = match event.body() {
             Body::Text(val) => val.as_ref(),
             _ => error_and_panic!("Invalid input, please use a string"), // Currently we only accept text

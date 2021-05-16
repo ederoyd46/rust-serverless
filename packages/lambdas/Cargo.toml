@@ -5,18 +5,18 @@ name = "lambdas"
 version = "0.2.0"
 
 [dependencies]
-lambda_http = {git = "https://github.com/awslabs/aws-lambda-rust-runtime/", rev = "a5f642d9c1c3a0c8f2a1dc6644dacf22f5276573"}
+lambda_http = "0.3.0"
+lambda_runtime = "0.3.0"
 lib = {path = "../lib"}
 log = "^0.4.14"
 tokio = { version = "1", features = ["full"] }
-serde_json = "^1.0.62"
+serde_json = "^1.0.64"
 
 # [dev-dependencies]
 # mockall = "0.8.0"
 
 [features]
 with-lambda = []
-# default = ["with-lambda"]
 
 [[bin]]
 name = "store_value"

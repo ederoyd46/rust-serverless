@@ -1,7 +1,6 @@
 #[cfg(feature = "with-lambda")]
 use lambda_http::{
-    handler,
-    lambda::{self},
+    handler
 };
 
 #[cfg(not(feature = "with-lambda"))]
@@ -31,7 +30,7 @@ async fn retrieve_handler(config: Config, key: CustomRetrieveValue) -> Result<Va
 async fn main() -> Result<(), Error> {
     initialise_logger()?;
 
-    lambda::run(handler(|event, _| {
+    lambda_runtime::run(handler(|event, _| {
         let key = lambdas::extract_key_from_request(event);
         let input = CustomRetrieveValue { key };
         let config = ConfigBuilder::new()
