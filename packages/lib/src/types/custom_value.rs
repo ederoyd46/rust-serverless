@@ -90,11 +90,11 @@ fn build_attribute_value(value: &Value) -> AttributeValue {
             ..Default::default()
         },
         Value::Object(val) => AttributeValue {
-            m: Some(build_dynamodb_object(&val)),
+            m: Some(build_dynamodb_object(val)),
             ..Default::default()
         },
         Value::Array(val) => AttributeValue {
-            l: Some(build_dynamodb_array(&val)),
+            l: Some(build_dynamodb_array(val)),
             ..Default::default()
         },
         Value::Null => AttributeValue {
