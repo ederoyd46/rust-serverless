@@ -12,6 +12,11 @@ use log::error;
 async fn main() -> Result<(), Error> {
     initialise_logger()?;
 
+    let config = ConfigBuilder::new()
+        .table_name(lambdas::get_table_name())
+        .build()
+        .await;
+
     lambda_http::run(service_fn(|event: Request| {
         let body = match event.body() {
             Body::Text(val) => val.as_ref(),
@@ -23,11 +28,8 @@ async fn main() -> Result<(), Error> {
         };
         let key = lambdas::extract_key_from_request(event);
         let data = CustomValue { key, value };
-        let config = ConfigBuilder::new()
-            .table_name(lambdas::get_table_name())
-            .build();
 
-        lambdas::store_handler(config, data)
+        lambdas::store_handler(&config, data)
     }))
     .await?;
     Ok(())

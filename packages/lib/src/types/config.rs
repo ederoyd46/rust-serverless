@@ -1,14 +1,9 @@
+use aws_types::SdkConfig;
+
 #[derive(Debug)]
 pub struct Config {
     pub table_name: String,
-    pub aws_sdk_region: String,
-    pub aws_sdk_endpoint: Option<String>,
-}
-
-impl Config {
-    pub async fn aws_config(&self) -> aws_types::SdkConfig {
-        aws_config::load_from_env().await
-    }
+    pub aws_sdk_config: SdkConfig,
 }
 
 pub struct ConfigBuilder {
@@ -40,12 +35,10 @@ impl ConfigBuilder {
         self.aws_sdk_region = region;
         self
     }
-
-    pub fn build(self) -> Config {
+    pub async fn build(self) -> Config {
         Config {
             table_name: self.table_name,
-            aws_sdk_endpoint: self.aws_sdk_endpoint,
-            aws_sdk_region: self.aws_sdk_region,
+            aws_sdk_config: aws_config::load_from_env().await, //TODO take the region and endpoint above into consideration
         }
     }
 }
