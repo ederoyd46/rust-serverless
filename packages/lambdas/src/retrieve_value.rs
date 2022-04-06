@@ -1,10 +1,10 @@
-use lambda_http::handler;
-
 use serde_json::Value;
 
 use lib::database::{get_db_client, retrieve_database_item};
 use lib::logger::initialise_logger;
 use lib::types::{Config, ConfigBuilder, CustomRetrieveValue, CustomValue, Error, Retrievable};
+
+use lambda_http::service_fn;
 
 async fn retrieve_handler(config: Config, key: CustomRetrieveValue) -> Result<Value, Error> {
     let item_from_dynamo =
@@ -17,7 +17,7 @@ async fn retrieve_handler(config: Config, key: CustomRetrieveValue) -> Result<Va
 async fn main() -> Result<(), Error> {
     initialise_logger()?;
 
-    lambda_runtime::run(handler(|event, _| {
+    lambda_http::run(service_fn(|event| {
         let key = lambdas::extract_key_from_request(event);
         let input = CustomRetrieveValue { key };
         let config = ConfigBuilder::new()

@@ -1,4 +1,4 @@
-use lambda_http::{handler, Body, Request};
+use lambda_http::{service_fn, Body, Request};
 
 use serde_json::Value;
 
@@ -26,7 +26,7 @@ async fn handle_store<T: Storable>(config: Config, event: T) -> Result<String, E
 async fn main() -> Result<(), Error> {
     initialise_logger()?;
 
-    lambda_runtime::run(handler(|event: Request, _| {
+    lambda_http::run(service_fn(|event: Request| {
         let body = match event.body() {
             Body::Text(val) => val.as_ref(),
             _ => error_and_panic!("Invalid input, please use a string"), // Currently we only accept text
