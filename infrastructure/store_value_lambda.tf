@@ -3,8 +3,8 @@ resource aws_lambda_function store_value {
     function_name = "store_value-${var.stage}"
     handler = "does.not.matter"
     runtime = "provided"
-    filename = "deploy/store_value.zip"
-    source_code_hash = filebase64sha256("deploy/store_value.zip")
+    filename = "../deploy/store_value.zip"
+    source_code_hash = filebase64sha256("../deploy/store_value.zip")
     role = aws_iam_role.base_lambda_role.arn
 
     environment {

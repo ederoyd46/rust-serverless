@@ -3,8 +3,8 @@ resource aws_lambda_function retrieve_value {
     function_name = "retrieve_value-${var.stage}"
     handler = "does.not.matter"
     runtime = "provided"
-    filename = "deploy/retrieve_value.zip"
-    source_code_hash = filebase64sha256("deploy/retrieve_value.zip")
+    filename = "../deploy/retrieve_value.zip"
+    source_code_hash = filebase64sha256("../deploy/retrieve_value.zip")
     role = aws_iam_role.base_lambda_role.arn
 
     environment {
