@@ -5,6 +5,12 @@ pub struct Config {
     pub aws_sdk_endpoint: Option<String>,
 }
 
+impl Config {
+    pub async fn aws_config(&self) -> aws_types::SdkConfig {
+        aws_config::load_from_env().await
+    }
+}
+
 pub struct ConfigBuilder {
     table_name: String,
     aws_sdk_region: String,

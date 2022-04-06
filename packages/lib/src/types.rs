@@ -1,18 +1,18 @@
+mod config;
 mod custom_retrieve_value;
 mod custom_value;
-mod config;
 
+pub use config::*;
 pub use custom_retrieve_value::CustomRetrieveValue;
 pub use custom_value::CustomValue;
-pub use config::*;
 
-use rusoto_dynamodb::AttributeValue;
+use aws_sdk_dynamodb::model::AttributeValue;
 use std::collections::HashMap;
 
 pub trait Storable: Send + Sync {
     fn is_valid(&self) -> bool;
-    fn get_pk(&self) -> String;
-    fn to_dynamo_db(&self) -> HashMap<String, AttributeValue>;
+    fn get_pk(&self) -> AttributeValue;
+    fn to_dynamo_db(&self) -> AttributeValue;
 }
 
 pub trait Retrievable<T>: Send + Sync {

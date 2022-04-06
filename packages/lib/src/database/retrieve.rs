@@ -1,24 +1,26 @@
 use crate::log_and_throw;
 use crate::types::CustomRetrieveValue;
+use aws_sdk_dynamodb::{
+    error::GetItemError, model::AttributeValue, output::GetItemOutput, types::SdkError,
+};
+
 use log::{self, debug, error};
-use rusoto_core::RusotoError;
-use rusoto_dynamodb::AttributeValue;
-use rusoto_dynamodb::{DynamoDb, DynamoDbClient, GetItemError, GetItemInput, GetItemOutput};
-use std::collections::HashMap;
+
+use aws_sdk_dynamodb::Client;
 
 pub async fn retrieve_database_item(
     table_name: &str,
     retrieve_value: &CustomRetrieveValue,
-    client: &DynamoDbClient,
-) -> Result<GetItemOutput, RusotoError<GetItemError>> {
-    let get_item = GetItemInput {
-        key: build_key_entry(retrieve_value.key.as_ref()),
-        table_name: table_name.to_string(),
-        ..Default::default()
-    };
-
-    debug!("About to get from DynamoDB {:?}", get_item);
-    let item_from_dynamo = match client.get_item(get_item).await {
+    client: &Client,
+) -> Result<GetItemOutput, SdkError<GetItemError>> {
+    debug!("About to get from DynamoDB {:?}", &retrieve_value.key);
+    let item_from_dynamo = match client
+        .get_item()
+        .table_name(table_name)
+        .key("PK", AttributeValue::S(retrieve_value.key.to_string()))
+        .send()
+        .await
+    {
         Ok(item) => item,
         Err(e) => log_and_throw!("Error completing read to database", e),
     };
@@ -26,17 +28,4 @@ pub async fn retrieve_database_item(
     debug!("Retrieved from DynamoDB");
 
     Ok(item_from_dynamo)
-}
-
-fn build_key_entry(key: &str) -> HashMap<String, AttributeValue> {
-    let mut item = HashMap::new();
-    item.insert(
-        "PK".to_string(),
-        AttributeValue {
-            s: Some(key.to_string()),
-            ..Default::default()
-        },
-    );
-
-    item
 }

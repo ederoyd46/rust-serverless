@@ -25,7 +25,7 @@ pub fn get_table_name() -> String {
 
 pub async fn retrieve_handler(config: Config, key: CustomRetrieveValue) -> Result<Value, Error> {
     let item_from_dynamo =
-        retrieve_database_item(&config.table_name, &key, get_db_client(&config)?).await?;
+        retrieve_database_item(&config.table_name, &key, get_db_client(&config).await?).await?;
     let retrieved_item = CustomValue::from_dynamo_db(item_from_dynamo.item.unwrap()).unwrap();
     Ok(retrieved_item.value().to_owned())
 }
@@ -36,9 +36,9 @@ pub async fn store_handler<T: Storable>(config: Config, data: T) -> Result<Strin
     }
 
     let item_from_dynamo =
-        store_database_item(&config.table_name, &data, get_db_client(&config)?).await?;
+        store_database_item(&config.table_name, &data, get_db_client(&config).await?).await?;
 
     info!("item: {:?}", item_from_dynamo);
 
-    Ok(format!("Stored, {}!", data.get_pk()))
+    Ok(format!("Stored, {}!", data.get_pk().as_s().unwrap()))
 }
