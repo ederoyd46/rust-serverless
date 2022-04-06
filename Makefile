@@ -42,14 +42,6 @@ else
 	@CROSS_COMPILE=$(CROSS_COMPILE) cargo build --target=$(CROSS_TARGET) --release
 endif
 
-# package: 
-# 	@for i in store_value retrieve_value; \
-# 	do \
-# 		mkdir -p deploy/$$i; \
-# 		cp target/$(CROSS_TARGET)/release/$$i deploy/$$i/bootstrap; \
-# 		zip -j -9 deploy/$$i.zip deploy/$$i/bootstrap; \
-# 	done;
-
 package.store_value: 
 	@mkdir -p deploy/store_value
 	@cp target/$(CROSS_TARGET)/release/store_value deploy/store_value/bootstrap
@@ -94,14 +86,3 @@ table.scan:
 table.get:
 	@$(AWS_CLI) dynamodb get-item --table-name $(DATA_STORE_NAME) --key '{"PK": {"S": "$(KEY)"}}'
 
-table.create:
-	@$(AWS_CLI) dynamodb create-table --table-name $(DATA_STORE_NAME) \
-		--attribute-definitions \
-			AttributeName=PK,AttributeType=S \
-		--key-schema \
-			AttributeName=PK,KeyType=HASH \
-		--billing-mode PAY_PER_REQUEST \
-		$(ENDPOINT)
-			
-table.remove: 
-	@$(AWS_CLI) dynamodb delete-table --table-name $(DATA_STORE_NAME)
