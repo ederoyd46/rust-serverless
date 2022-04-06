@@ -2,25 +2,11 @@ use lambda_http::{service_fn, Body, Request};
 
 use serde_json::Value;
 
-use lib::database::{get_db_client, store_database_item};
 use lib::error_and_panic;
 use lib::logger::initialise_logger;
-use lib::types::{Config, ConfigBuilder, CustomValue, Error, Storable};
+use lib::types::{ConfigBuilder, CustomValue, Error};
 
-use log::{error, info};
-
-async fn handle_store<T: Storable>(config: Config, event: T) -> Result<String, Error> {
-    if !event.is_valid() {
-        error_and_panic!("No key specified");
-    }
-
-    let item_from_dynamo =
-        store_database_item(&config.table_name, &event, get_db_client(&config)?).await?;
-
-    info!("item: {:?}", item_from_dynamo);
-
-    Ok(format!("Stored, {}!", event.get_pk()))
-}
+use log::error;
 
 #[tokio::main]
 async fn main() -> Result<(), Error> {
@@ -36,12 +22,12 @@ async fn main() -> Result<(), Error> {
             Err(e) => error_and_panic!("Could not parse input to known type", e),
         };
         let key = lambdas::extract_key_from_request(event);
-        let input = CustomValue { key, value };
+        let data = CustomValue { key, value };
         let config = ConfigBuilder::new()
             .table_name(lambdas::get_table_name())
             .build();
 
-        handle_store(config, input)
+        lambdas::store_handler(config, data)
     }))
     .await?;
     Ok(())

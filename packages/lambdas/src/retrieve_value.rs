@@ -1,17 +1,7 @@
-use serde_json::Value;
-
-use lib::database::{get_db_client, retrieve_database_item};
 use lib::logger::initialise_logger;
-use lib::types::{Config, ConfigBuilder, CustomRetrieveValue, CustomValue, Error, Retrievable};
+use lib::types::{ConfigBuilder, CustomRetrieveValue, Error};
 
 use lambda_http::service_fn;
-
-async fn retrieve_handler(config: Config, key: CustomRetrieveValue) -> Result<Value, Error> {
-    let item_from_dynamo =
-        retrieve_database_item(&config.table_name, &key, get_db_client(&config)?).await?;
-    let retrieved_item = CustomValue::from_dynamo_db(item_from_dynamo.item.unwrap()).unwrap();
-    Ok(retrieved_item.value().to_owned())
-}
 
 #[tokio::main]
 async fn main() -> Result<(), Error> {
@@ -19,12 +9,12 @@ async fn main() -> Result<(), Error> {
 
     lambda_http::run(service_fn(|event| {
         let key = lambdas::extract_key_from_request(event);
-        let input = CustomRetrieveValue { key };
+        let key = CustomRetrieveValue { key };
         let config = ConfigBuilder::new()
             .table_name(lambdas::get_table_name())
             .build();
 
-        retrieve_handler(config, input)
+        lambdas::retrieve_handler(config, key)
     }))
     .await?;
     Ok(())
