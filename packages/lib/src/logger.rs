@@ -1,4 +1,4 @@
-use log::{LevelFilter};
+use log::LevelFilter;
 
 use crate::types::Error;
 

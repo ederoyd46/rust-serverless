@@ -45,11 +45,13 @@ endif
 package.store_value: 
 	@mkdir -p deploy/store_value
 	@cp target/$(CROSS_TARGET)/release/store_value deploy/store_value/bootstrap
+	# @upx -9 deploy/store_value/bootstrap
 	@zip -j -9 deploy/store_value.zip deploy/store_value/bootstrap
 
 package.retrieve_value: 
 	@mkdir -p deploy/retrieve_value
 	@cp target/$(CROSS_TARGET)/release/retrieve_value deploy/retrieve_value/bootstrap
+	# @upx -9 deploy/retrieve_value/bootstrap
 	@zip -j -9 deploy/retrieve_value.zip deploy/retrieve_value/bootstrap
 
 package: package.store_value package.retrieve_value
