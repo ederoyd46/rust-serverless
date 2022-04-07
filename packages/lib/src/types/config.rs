@@ -1,9 +1,10 @@
+use aws_sdk_dynamodb::Client;
 use aws_types::SdkConfig;
-
 #[derive(Debug)]
 pub struct Config {
     pub table_name: String,
     pub aws_sdk_config: SdkConfig,
+    pub dynamodb: Client,
 }
 
 pub struct ConfigBuilder {
@@ -36,9 +37,11 @@ impl ConfigBuilder {
         self
     }
     pub async fn build(self) -> Config {
+        let aws_sdk_config = aws_config::load_from_env().await; //TODO take the region and endpoint above into consideration
         Config {
             table_name: self.table_name,
-            aws_sdk_config: aws_config::load_from_env().await, //TODO take the region and endpoint above into consideration
+            dynamodb: aws_sdk_dynamodb::Client::new(&aws_sdk_config),
+            aws_sdk_config,
         }
     }
 }

@@ -86,3 +86,9 @@ table.scan:
 table.get:
 	@$(AWS_CLI) dynamodb get-item --table-name $(DATA_STORE_NAME) --key '{"PK": {"S": "$(KEY)"}}'
 
+
+tail.retrieve:
+	@$(AWS_CLI) logs tail "/aws/lambda/retrieve_value-${USER}" --follow --format short
+
+tail.store:
+	@$(AWS_CLI) logs tail "/aws/lambda/store_value-${USER}" --follow --format short

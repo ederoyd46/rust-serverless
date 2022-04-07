@@ -852,7 +852,6 @@ dependencies = [
  "aws-types",
  "env_logger",
  "log",
- "once_cell",
  "serde",
  "serde_derive",
  "serde_json",

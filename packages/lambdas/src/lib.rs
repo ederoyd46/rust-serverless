@@ -1,5 +1,5 @@
 use lambda_http::Request;
-use lib::database::{get_db_client, retrieve_database_item, store_database_item};
+use lib::database::{retrieve_database_item, store_database_item};
 use lib::error_and_panic;
 use lib::types::{Config, CustomRetrieveValue, CustomValue, Error, Retrievable, Storable};
 use log::{debug, error, info};
@@ -25,7 +25,7 @@ pub fn get_table_name() -> String {
 
 pub async fn retrieve_handler(config: &Config, key: CustomRetrieveValue) -> Result<Value, Error> {
     let item_from_dynamo =
-        retrieve_database_item(&config.table_name, &key, get_db_client(&config)?).await?;
+        retrieve_database_item(&config.table_name, &key, &config.dynamodb).await?;
     let retrieved_item = CustomValue::from_dynamo_db(item_from_dynamo.item.unwrap()).unwrap();
     Ok(retrieved_item.value().to_owned())
 }
@@ -35,8 +35,7 @@ pub async fn store_handler<T: Storable>(config: &Config, data: T) -> Result<Stri
         error_and_panic!("No key specified");
     }
 
-    let item_from_dynamo =
-        store_database_item(&config.table_name, &data, get_db_client(&config)?).await?;
+    let item_from_dynamo = store_database_item(&config.table_name, &data, &config.dynamodb).await?;
 
     info!("item: {:?}", item_from_dynamo);
 
