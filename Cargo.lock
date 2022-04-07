@@ -830,6 +830,7 @@ name = "lambdas"
 version = "0.4.0"
 dependencies = [
  "aws-config",
+ "env_logger",
  "lambda_http",
  "lib",
  "log",
@@ -850,7 +851,6 @@ dependencies = [
  "aws-config",
  "aws-sdk-dynamodb",
  "aws-types",
- "env_logger",
  "log",
  "serde",
  "serde_derive",

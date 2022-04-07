@@ -3,14 +3,14 @@ use lambda_http::{service_fn, Body, Request};
 use serde_json::Value;
 
 use lib::error_and_panic;
-use lib::logger::initialise_logger;
 use lib::types::{ConfigBuilder, CustomValue, Error};
 
 use log::{error, info};
 
 #[tokio::main]
 async fn main() -> Result<(), Error> {
-    initialise_logger()?;
+    lambdas::initialise_logger()?;
+
     info!("Running Main");
     let config = ConfigBuilder::new()
         .table_name(lambdas::get_table_name())

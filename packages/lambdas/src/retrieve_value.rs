@@ -1,11 +1,10 @@
-use lib::logger::initialise_logger;
 use lib::types::{ConfigBuilder, CustomRetrieveValue, Error};
 
 use lambda_http::service_fn;
 
 #[tokio::main]
 async fn main() -> Result<(), Error> {
-    initialise_logger()?;
+    lambdas::initialise_logger()?;
 
     let config = ConfigBuilder::new()
         .table_name(lambdas::get_table_name())

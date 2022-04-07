@@ -2,7 +2,7 @@ use lambda_http::Request;
 use lib::database::{retrieve_database_item, store_database_item};
 use lib::error_and_panic;
 use lib::types::{Config, CustomRetrieveValue, CustomValue, Error, Retrievable, Storable};
-use log::{debug, error, info};
+use log::{debug, error, info, LevelFilter, SetLoggerError};
 use serde_json::Value;
 use std::env;
 
@@ -40,4 +40,14 @@ pub async fn store_handler<T: Storable>(config: &Config, data: T) -> Result<Stri
     info!("item: {:?}", item_from_dynamo);
 
     Ok(format!("Stored, {}!", data.get_pk().as_s().unwrap()))
+}
+
+pub fn initialise_logger() -> Result<(), SetLoggerError> {
+    env_logger::builder()
+        .filter(Some("store_value"), LevelFilter::Debug)
+        .filter(Some("retrieve_value"), LevelFilter::Debug)
+        .filter(Some("lib::database"), LevelFilter::Debug)
+        .filter_level(LevelFilter::Info)
+        .init();
+    Ok(())
 }
