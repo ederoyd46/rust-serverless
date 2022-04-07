@@ -40,11 +40,7 @@ impl Storable for CustomValue {
     }
 
     fn to_dynamo_db(&self) -> AttributeValue {
-        AttributeValue::M(
-            vec![("value".to_string(), build_attribute_value(self.value()))]
-                .into_iter()
-                .collect(),
-        )
+        build_attribute_value(self.value())
     }
 }
 
