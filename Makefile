@@ -61,12 +61,13 @@ build.package.deploy: release package deploy
 
 # TEST
 test.lambda.store.value:
-	@API_URL=$(shell $(TERRAFORM) output base_url); \
+	@API_URL=$(shell $(TERRAFORM) output store_value_url); \
 	FILES="$(shell ls ./etc)"; \
 	echo $$FILES; \
 	for f in $$FILES; \
 	do \
-		curl -X POST "$$API_URL/db/$$f" -d "@./etc/$$f"; \
+		# curl -X POST "$$API_URL/db/$$f" -d "@./etc/$$f"; \
+		curl -X POST "$$API_URL/$$f" -d "@./etc/$$f"; \
 	done;
 
 test.lambda.retrieve.value:
