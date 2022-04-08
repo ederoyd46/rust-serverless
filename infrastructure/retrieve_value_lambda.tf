@@ -13,7 +13,7 @@
 #   local_existing_package            = "../deploy/retrieve_value.zip"
 #   memory_size                       = 128
 #   timeout                           = 3
-  
+
 
 #   environment_variables = {
 #     DATABASE = aws_dynamodb_table.data_store.name
@@ -64,37 +64,53 @@ resource "aws_cloudwatch_log_group" "retrieve_value" {
 }
 
 # API Gateway
-resource "aws_api_gateway_method" "retrieve_value" {
-  rest_api_id   = aws_api_gateway_rest_api.api.id
-  resource_id   = aws_api_gateway_resource.db_key.id
-  http_method   = "GET"
-  authorization = "NONE"
+# resource "aws_api_gateway_method" "retrieve_value" {
+#   rest_api_id   = aws_api_gateway_rest_api.api.id
+#   resource_id   = aws_api_gateway_resource.db_key.id
+#   http_method   = "GET"
+#   authorization = "NONE"
 
-  request_parameters = {
-    "method.request.path.key" = true
-  }
-}
+#   request_parameters = {
+#     "method.request.path.key" = true
+#   }
+# }
 
-resource "aws_api_gateway_integration" "retrieve_value" {
-  rest_api_id = aws_api_gateway_rest_api.api.id
-  resource_id = aws_api_gateway_method.retrieve_value.resource_id
-  http_method = aws_api_gateway_method.retrieve_value.http_method
+# resource "aws_api_gateway_integration" "retrieve_value" {
+#   rest_api_id = aws_api_gateway_rest_api.api.id
+#   resource_id = aws_api_gateway_method.retrieve_value.resource_id
+#   http_method = aws_api_gateway_method.retrieve_value.http_method
 
-  # TODO Does this always need to be a POST even though the API is GET
-  integration_http_method = "POST"
-  type                    = "AWS_PROXY"
-  uri                     = aws_lambda_function.retrieve_value.invoke_arn
-}
+#   # TODO Does this always need to be a POST even though the API is GET
+#   integration_http_method = "POST"
+#   type                    = "AWS_PROXY"
+#   uri                     = aws_lambda_function.retrieve_value.invoke_arn
+# }
 
-resource "aws_lambda_permission" "retrieve_value" {
-  statement_id  = "AllowAPIGatewayInvoke"
-  action        = "lambda:InvokeFunction"
-  function_name = aws_lambda_function.retrieve_value.function_name
-  principal     = "apigateway.amazonaws.com"
+# resource "aws_lambda_permission" "retrieve_value" {
+#   statement_id  = "AllowAPIGatewayInvoke"
+#   action        = "lambda:InvokeFunction"
+#   function_name = aws_lambda_function.retrieve_value.function_name
+#   principal     = "apigateway.amazonaws.com"
 
-  # The "/*/*" portion grants access from any method on any resource
-  # within the API Gateway REST API.
-  source_arn = "${aws_api_gateway_rest_api.api.execution_arn}/*/*"
+#   # The "/*/*" portion grants access from any method on any resource
+#   # within the API Gateway REST API.
+#   source_arn = "${aws_api_gateway_rest_api.api.execution_arn}/*/*"
+# }
+
+
+resource "aws_lambda_function_url" "retrieve_value" {
+  function_name      = aws_lambda_function.retrieve_value.function_name
+  authorization_type = "NONE"
+  # cors {
+  #   allow_credentials = true
+  #   allow_origins     = ["*"]
+  #   allow_methods     = ["POST"]
+  #   allow_headers     = ["date", "keep-alive"]
+  #   expose_headers    = ["keep-alive", "date"]
+  #   max_age           = 86400
+  # }
+  #   qualifier          = "my_alias"
+  #   authorization_type = "AWS_IAM"
 }
 
 # Outputs
@@ -104,4 +120,8 @@ output "retrieve_value_lambda" {
 
 output "retrieve_value_lambda_log_group" {
   value = aws_cloudwatch_log_group.retrieve_value.arn
+}
+
+output "retrieve_value_url" {
+  value = aws_lambda_function_url.retrieve_value.function_url
 }

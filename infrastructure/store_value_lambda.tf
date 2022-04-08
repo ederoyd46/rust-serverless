@@ -23,46 +23,37 @@ resource "aws_cloudwatch_log_group" "store_value" {
 }
 
 # API Gateway
-resource "aws_api_gateway_method" "store_value" {
-  rest_api_id   = aws_api_gateway_rest_api.api.id
-  resource_id   = aws_api_gateway_resource.db_key.id
-  http_method   = "POST"
-  authorization = "NONE"
+# resource "aws_api_gateway_method" "store_value" {
+#   rest_api_id   = aws_api_gateway_rest_api.api.id
+#   resource_id   = aws_api_gateway_resource.db_key.id
+#   http_method   = "POST"
+#   authorization = "NONE"
 
-  request_parameters = {
-    "method.request.path.key" = true
-  }
-}
+#   request_parameters = {
+#     "method.request.path.key" = true
+#   }
+# }
 
-resource "aws_api_gateway_integration" "store_value" {
-  rest_api_id = aws_api_gateway_rest_api.api.id
-  resource_id = aws_api_gateway_method.store_value.resource_id
-  http_method = aws_api_gateway_method.store_value.http_method
+# resource "aws_api_gateway_integration" "store_value" {
+#   rest_api_id = aws_api_gateway_rest_api.api.id
+#   resource_id = aws_api_gateway_method.store_value.resource_id
+#   http_method = aws_api_gateway_method.store_value.http_method
 
-  integration_http_method = "POST"
-  type                    = "AWS_PROXY"
-  uri                     = aws_lambda_function.store_value.invoke_arn
-}
+#   integration_http_method = "POST"
+#   type                    = "AWS_PROXY"
+#   uri                     = aws_lambda_function.store_value.invoke_arn
+# }
 
-resource "aws_lambda_permission" "store_value" {
-  statement_id  = "AllowAPIGatewayInvoke"
-  action        = "lambda:InvokeFunction"
-  function_name = aws_lambda_function.store_value.function_name
-  principal     = "apigateway.amazonaws.com"
+# resource "aws_lambda_permission" "store_value" {
+#   statement_id  = "AllowAPIGatewayInvoke"
+#   action        = "lambda:InvokeFunction"
+#   function_name = aws_lambda_function.store_value.function_name
+#   principal     = "apigateway.amazonaws.com"
 
-  # The "/*/*" portion grants access from any method on any resource
-  # within the API Gateway REST API.
-  source_arn = "${aws_api_gateway_rest_api.api.execution_arn}/*/*"
-}
-
-# Outputs
-output "store_value_lambda" {
-  value = aws_lambda_function.store_value.arn
-}
-
-output "store_value_lambda_log_group" {
-  value = aws_cloudwatch_log_group.store_value.arn
-}
+#   # The "/*/*" portion grants access from any method on any resource
+#   # within the API Gateway REST API.
+#   source_arn = "${aws_api_gateway_rest_api.api.execution_arn}/*/*"
+# }
 
 
 
@@ -79,28 +70,19 @@ resource "aws_lambda_function_url" "store_value" {
   #   max_age           = 86400
   # }
   #   qualifier          = "my_alias"
-#   authorization_type = "AWS_IAM"
+  #   authorization_type = "AWS_IAM"
+}
 
+# Outputs
+output "store_value_lambda" {
+  value = aws_lambda_function.store_value.arn
+}
+
+output "store_value_lambda_log_group" {
+  value = aws_cloudwatch_log_group.store_value.arn
 }
 
 output "store_value_url" {
   value = aws_lambda_function_url.store_value.function_url
 
 }
-
-
-
-# resource "aws_lambda_function_url" "test_live" {
-#   function_name      = aws_lambda_function.store_value.function_name
-#   qualifier          = "my_alias"
-#   authorization_type = "AWS_IAM"
-
-#   cors {
-#     allow_credentials = true
-#     allow_origins     = ["*"]
-#     allow_methods     = ["*"]
-#     allow_headers     = ["date", "keep-alive"]
-#     expose_headers    = ["keep-alive", "date"]
-#     max_age           = 86400
-#   }
-# }

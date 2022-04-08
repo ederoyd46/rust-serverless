@@ -71,11 +71,11 @@ test.lambda.store.value:
 	done;
 
 test.lambda.retrieve.value:
-	@API_URL=$(shell $(TERRAFORM) output base_url); \
+	@API_URL=$(shell $(TERRAFORM) output retrieve_value_url); \
 	FILES="$(shell ls ./etc)"; \
 	for i in $$FILES; \
 	do \
-		curl -X GET $$API_URL/db/$$i; \
+		curl -X GET $$API_URL/$$i; \
 	done;
 
 # Table tasks
