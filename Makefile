@@ -2,7 +2,6 @@
 BASE_DIR=$(shell pwd)
 UNAME_S=$(shell uname -s)
 STAGE=${USER}
-DATA_STORE_NAME=rust_serverless_store-$(STAGE)
 
 AWS_CLI=aws
 TERRAFORM=terraform -chdir=./infrastructure
@@ -23,16 +22,16 @@ test:
 
 #  Terraform
 plan:
-	@$(TERRAFORM) plan -var stage=$(STAGE)
+	@$(TERRAFORM) plan
 
 terraform.init:
 	@$(TERRAFORM) init
 
 deploy:
-	@$(TERRAFORM) apply -var stage=$(STAGE) -auto-approve
+	@$(TERRAFORM) apply -auto-approve
 
 remove:
-	@$(TERRAFORM) destroy -var stage=$(STAGE) -auto-approve
+	@$(TERRAFORM) destroy -auto-approve
 
 
 release:
@@ -71,11 +70,11 @@ test.lambda.store.value:
 	done;
 
 test.lambda.retrieve.value:
-	@API_URL=$(shell $(TERRAFORM) output base_url); \
+	@API_URL=$(shell $(TERRAFORM) output retrieve_value_url); \
 	FILES="$(shell ls ./etc)"; \
 	for i in $$FILES; \
 	do \
-		curl -X GET $$API_URL/db/$$i; \
+		curl -X GET $$API_URL/$$i; \
 	done;
 
 # Table tasks
@@ -83,15 +82,19 @@ table.list:
 	@$(AWS_CLI) dynamodb list-tables
 
 table.scan:
-	@$(AWS_CLI) dynamodb scan --table-name $(DATA_STORE_NAME) $(ENDPOINT)
+	@DATA_STORE_NAME=$(shell $(TERRAFORM) output data_store_name); \
+	$(AWS_CLI) dynamodb scan --table-name $$DATA_STORE_NAME
 
 # e.g make table.get KEY="bedford.json"
 table.get:
-	@$(AWS_CLI) dynamodb get-item --table-name $(DATA_STORE_NAME) --key '{"PK": {"S": "$(KEY)"}}'
+	@DATA_STORE_NAME=$(shell $(TERRAFORM) output data_store_name); \
+	$(AWS_CLI) dynamodb get-item --table-name $$DATA_STORE_NAME --key '{"PK": {"S": "$(KEY)"}}'
 
 
-tail.retrieve:
-	@$(AWS_CLI) logs tail "/aws/lambda/retrieve_value-${USER}" --follow --format short
+tail.retrieve_value:
+	@LOG_GROUP_NAME=$(shell $(TERRAFORM) output retrieve_value_lambda_log_group); \
+	$(AWS_CLI) logs tail $$LOG_GROUP_NAME --follow --format short
 
-tail.store:
-	@$(AWS_CLI) logs tail "/aws/lambda/store_value-${USER}" --follow --format short
+tail.store_value:
+	@LOG_GROUP_NAME=$(shell $(TERRAFORM) output store_value_lambda_log_group); \
+	$(AWS_CLI) logs tail $$LOG_GROUP_NAME --follow --format short
