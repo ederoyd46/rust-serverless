@@ -70,11 +70,11 @@ This target runs Terraform and deploys the Lambdas.
 make deploy
 ```
 
-### Build Package Deploy
-A helper target which runs `build`, `package` and `deploy`
+### Release Package Deploy
+A helper target which runs `release`, `package` and `deploy`
 
 ```sh
-make build.package.deploy
+make release.package.deploy
 ```
 
 ### Other commands

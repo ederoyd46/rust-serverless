@@ -55,7 +55,7 @@ package.retrieve_value:
 
 package: package.store_value package.retrieve_value
 
-build.package.deploy: release package deploy
+release.package.deploy: release package deploy
 
 
 # TEST
