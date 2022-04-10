@@ -22,16 +22,16 @@ test:
 
 #  Terraform
 plan:
-	@$(TERRAFORM) plan -var stage=$(STAGE)
+	@$(TERRAFORM) plan
 
 terraform.init:
 	@$(TERRAFORM) init
 
 deploy:
-	@$(TERRAFORM) apply -var stage=$(STAGE) -auto-approve
+	@$(TERRAFORM) apply -auto-approve
 
 remove:
-	@$(TERRAFORM) destroy -var stage=$(STAGE) -auto-approve
+	@$(TERRAFORM) destroy -auto-approve
 
 
 release:

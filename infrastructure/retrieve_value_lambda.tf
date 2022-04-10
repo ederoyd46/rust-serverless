@@ -3,7 +3,7 @@ module "retrieve_value" {
   source  = "terraform-aws-modules/lambda/aws"
   version = "3.1.0"
 
-  function_name                     = "retrieve_value-${var.stage}"
+  function_name                     = "retrieve_value-${terraform.workspace}"
   description                       = "Retrieve Value"
   handler                           = "does.not.matter"
   runtime                           = "provided"
