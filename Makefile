@@ -2,7 +2,6 @@
 BASE_DIR=$(shell pwd)
 UNAME_S=$(shell uname -s)
 STAGE=${USER}
-DATA_STORE_NAME=rust_serverless_store-$(STAGE)
 
 AWS_CLI=aws
 TERRAFORM=terraform -chdir=./infrastructure
@@ -83,15 +82,19 @@ table.list:
 	@$(AWS_CLI) dynamodb list-tables
 
 table.scan:
-	@$(AWS_CLI) dynamodb scan --table-name $(DATA_STORE_NAME) $(ENDPOINT)
+	@DATA_STORE_NAME=$(shell $(TERRAFORM) output data_store_name); \
+	$(AWS_CLI) dynamodb scan --table-name $$DATA_STORE_NAME
 
 # e.g make table.get KEY="bedford.json"
 table.get:
-	@$(AWS_CLI) dynamodb get-item --table-name $(DATA_STORE_NAME) --key '{"PK": {"S": "$(KEY)"}}'
+	@DATA_STORE_NAME=$(shell $(TERRAFORM) output data_store_name); \
+	$(AWS_CLI) dynamodb get-item --table-name $$DATA_STORE_NAME --key '{"PK": {"S": "$(KEY)"}}'
 
 
-tail.retrieve:
-	@$(AWS_CLI) logs tail "/aws/lambda/retrieve_value-${USER}" --follow --format short
+tail.retrieve_value:
+	@LOG_GROUP_NAME=$(shell $(TERRAFORM) output retrieve_value_lambda_log_group); \
+	$(AWS_CLI) logs tail $$LOG_GROUP_NAME --follow --format short
 
-tail.store:
-	@$(AWS_CLI) logs tail "/aws/lambda/store_value-${USER}" --follow --format short
+tail.store_value:
+	@LOG_GROUP_NAME=$(shell $(TERRAFORM) output store_value_lambda_log_group); \
+	$(AWS_CLI) logs tail $$LOG_GROUP_NAME --follow --format short

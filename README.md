@@ -5,16 +5,12 @@ Learning the Rust language and how this would work in a serverless environment.
 
 ## Dependencies
 - [Rustup](https://rustup.rs/)
-- [Cross](https://crates.io/crates/cross)
-- [Docker](https://www.docker.com/)
 - [DynamoDB](https://aws.amazon.com/dynamodb/)
 - [Terraform](https://www.terraform.io/)
 - [AWS CLI](https://aws.amazon.com/cli/)
 
 ## Setup
 _Most_ commands needed to use this project up have been added to the Makefile.
-
-By default the project is compiled without Lambda support to run against a local DynamoDB instance running on `http://${your_hostname}:8000`. 
 
 ### Set up Mac OS for Cross Compiling to Static Linux Binaries
 
@@ -30,8 +26,6 @@ brew install musl-cross
 [target.x86_64-unknown-linux-musl]
 linker = "x86_64-linux-musl-gcc"
 ```
-
-- Change the `USE_DOCKER_CROSS_COMPILE` variable to `false` in the Makefile.
 
 - Make sure you've installed the correct toolchain with `rustup`
 ```sh
@@ -49,33 +43,11 @@ apt-get install -y musl musl-dev musl-tools
 rustup component add rust-std-x86_64-unknown-linux-musl
 ```
 
-### Start Local DynamoDB
-A docker-compose.yml has been provided. Run the command below to start a DynamoDB instance.
-
-```sh
-docker-compose up -d
-```
-
-### Create DynamoDB Table
-
-Docker uses a volume for storage so this only needs to be run once.
-
-```sh
-make table.create
-```
-
 ### Compile for Development
 
 ```sh
 make build
 ```
-
-### Compile with Lambda Support
-
-```sh
-make build.with.features
-```
-_NOTE - If you're working on a Mac this will not work if you deploy it to AWS._
 
 ### Release
 This will compile with Lambda support for release to keep the binary size down. We create static binaries so we don't need to worry about glibc versions.
@@ -106,12 +78,6 @@ make build.package.deploy
 ```
 
 ### Other commands
-Build the docker image to compile static binaries on (only needed if you're not using Linux and don't have musl set up locally).
-
-```sh
-make build.image
-```
-
 List DynamoDB tables.
 
 ```sh
@@ -121,11 +87,6 @@ make table.list
 Scan DynamoDB table.
 ```sh
 make table.scan
-```
-
-Remove DynamoDB table.
-```sh
-make table.remove
 ```
 
 Terraform Plan
@@ -139,16 +100,6 @@ Remove Terraform resources.
 make remove
 ```
 
-Test Local Store Value Lambda.
-```sh
-make test.local.store.value
-```
-
-Test Local Retrieve Value Lambda.
-```sh
-make test.local.retrieve.value
-```
-
 Test AWS Store Value Lambda.
 ```sh
 make test.lambda.store.value
@@ -159,3 +110,12 @@ Test AWS Retrieve Value Lambda.
 make test.lambda.retrieve.value
 ```
 
+Tail the store value lambda logs
+```sh
+make tail.store_value
+```
+
+Tail the retrieve value lambda logs
+```sh
+make tail.retrieve_value
+```
