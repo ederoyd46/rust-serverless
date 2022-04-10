@@ -28,13 +28,6 @@ module "retrieve_value" {
     },
   }
 
-  #   allowed_triggers = {
-  #     ApiGateway = {
-  #       service    = "apigateway"
-  #       source_arn = "${aws_api_gateway_rest_api.gateway.execution_arn}/*/*"
-  #     }
-  #   }
-
 }
 
 resource "aws_lambda_function_url" "retrieve_value" {
@@ -54,13 +47,6 @@ resource "aws_lambda_function_url" "retrieve_value" {
 
 # Outputs
 output "retrieve_value_lambda" {
-<<<<<<< HEAD
-  value = aws_lambda_function.retrieve_value.arn
-}
-
-output "retrieve_value_lambda_log_group" {
-  value = aws_cloudwatch_log_group.retrieve_value.arn
-=======
   value = module.retrieve_value.lambda_function_arn
 }
 
@@ -70,5 +56,4 @@ output "retrieve_value_lambda_log_group" {
 
 output "retrieve_value_url" {
   value = aws_lambda_function_url.retrieve_value.function_url
->>>>>>> c934f29d9638dcbc46a7b8437be14a8010245b3e
 }

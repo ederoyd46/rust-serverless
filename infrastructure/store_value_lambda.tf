@@ -1,6 +1,6 @@
 # Store Lambda
 locals {
-  service_name="${terraform.workspace}_store_value"
+  service_name = "${terraform.workspace}_store_value"
 }
 
 module "store_value" {
@@ -61,44 +61,3 @@ output "store_value_lambda_log_group" {
 output "store_value_url" {
   value = aws_lambda_function_url.store_value.function_url
 }
-
-
-
-
-resource "aws_lambda_function_url" "store_value" {
-  function_name      = aws_lambda_function.store_value.function_name
-  authorization_type = "NONE"
-  # cors {
-  #   allow_credentials = true
-  #   allow_origins     = ["*"]
-  #   allow_methods     = ["POST"]
-  #   allow_headers     = ["date", "keep-alive"]
-  #   expose_headers    = ["keep-alive", "date"]
-  #   max_age           = 86400
-  # }
-  #   qualifier          = "my_alias"
-#   authorization_type = "AWS_IAM"
-
-}
-
-output "store_value_url" {
-  value = aws_lambda_function_url.store_value.function_url
-
-}
-
-
-
-# resource "aws_lambda_function_url" "test_live" {
-#   function_name      = aws_lambda_function.store_value.function_name
-#   qualifier          = "my_alias"
-#   authorization_type = "AWS_IAM"
-
-#   cors {
-#     allow_credentials = true
-#     allow_origins     = ["*"]
-#     allow_methods     = ["*"]
-#     allow_headers     = ["date", "keep-alive"]
-#     expose_headers    = ["keep-alive", "date"]
-#     max_age           = 86400
-#   }
-# }
