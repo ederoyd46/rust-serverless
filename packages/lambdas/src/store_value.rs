@@ -18,9 +18,11 @@ async fn main() -> Result<(), Error> {
         .await;
 
     lambda_http::run(service_fn(|event: Request| {
+        // info!("Event {:?}", event);
         let body = match event.body() {
             Body::Text(val) => val.as_ref(),
-            _ => error_and_panic!("Invalid input, please use a string"), // Currently we only accept text
+            Body::Binary(val) => std::str::from_utf8(val).unwrap(),
+            Body::Empty => error_and_panic!("Invalid input, please use a string"),
         };
         let value: Value = match serde_json::from_str(body) {
             Ok(item) => item,
