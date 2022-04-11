@@ -97,92 +97,65 @@ fn build_dynamodb_array(object: &[Value]) -> AttributeValue {
     AttributeValue::L(object.iter().map(|v| build_attribute_value(v)).collect())
 }
 
-// #[cfg(test)]
-// mod tests {
-//     use super::build_attribute_value;
-//     use rusoto_dynamodb::AttributeValue;
-//     use serde_json::{Number, Value};
+#[cfg(test)]
+mod tests {
+    use super::build_attribute_value;
+    use aws_sdk_dynamodb::model::AttributeValue;
+    use serde_json::{Number, Value};
 
-//     #[test]
-//     fn test_build_string_attribute_value() {
-//         let value = Value::String("String Value".to_string());
-//         let expected = AttributeValue {
-//             s: Some("String Value".to_string()),
-//             ..Default::default()
-//         };
-//         assert_eq!(build_attribute_value(&value), expected);
-//     }
+    #[test]
+    fn test_build_string_attribute_value() {
+        let value = Value::String("String Value".to_string());
+        let expected = AttributeValue::S("String Value".to_string());
+        assert_eq!(build_attribute_value(&value), expected);
+    }
 
-//     #[test]
-//     fn test_build_number_attribute_value() {
-//         let value = Value::Number(Number::from(100));
-//         let expected = AttributeValue {
-//             n: Some(100.to_string()),
-//             ..Default::default()
-//         };
-//         assert_eq!(build_attribute_value(&value), expected);
-//     }
+    #[test]
+    fn test_build_number_attribute_value() {
+        let value = Value::Number(Number::from(100));
+        let expected = AttributeValue::N(100.to_string());
+        assert_eq!(build_attribute_value(&value), expected);
+    }
 
-//     #[test]
-//     fn test_build_boolean_attribute_value() {
-//         let value = Value::Bool(true);
-//         let expected = AttributeValue {
-//             bool: Some(true),
-//             ..Default::default()
-//         };
-//         assert_eq!(build_attribute_value(&value), expected);
-//     }
+    #[test]
+    fn test_build_boolean_attribute_value() {
+        let value = Value::Bool(true);
+        let expected = AttributeValue::Bool(true);
+        assert_eq!(build_attribute_value(&value), expected);
+    }
 
-//     #[test]
-//     fn test_build_object_attribute_value() {
-//         let value = Value::Object(
-//             vec![("boolean".to_string(), Value::Bool(true))]
-//                 .into_iter()
-//                 .collect(),
-//         );
+    #[test]
+    fn test_build_object_attribute_value() {
+        let value = Value::Object(
+            vec![("boolean".to_string(), Value::Bool(true))]
+                .into_iter()
+                .collect(),
+        );
 
-//         let expected = AttributeValue {
-//             m: Some(
-//                 vec![(
-//                     "boolean".to_string(),
-//                     AttributeValue {
-//                         bool: Some(true),
-//                         ..Default::default()
-//                     },
-//                 )]
-//                 .into_iter()
-//                 .collect(),
-//             ),
-//             ..Default::default()
-//         };
-//         assert_eq!(build_attribute_value(&value), expected);
-//     }
+        let expected = AttributeValue::M(
+            vec![("boolean".to_string(), AttributeValue::Bool(true))]
+                .into_iter()
+                .collect(),
+        );
+        assert_eq!(build_attribute_value(&value), expected);
+    }
 
-//     #[test]
-//     fn test_build_list_attribute_value() {
-//         let list_value = vec![Value::Bool(true), Value::String("String Value".to_string())]
-//             .into_iter()
-//             .collect();
+    #[test]
+    fn test_build_list_attribute_value() {
+        let list_value = vec![Value::Bool(true), Value::String("String Value".to_string())]
+            .into_iter()
+            .collect();
 
-//         let value = Value::Array(list_value);
+        let value = Value::Array(list_value);
 
-//         let expected = AttributeValue {
-//             l: Some(
-//                 vec![
-//                     AttributeValue {
-//                         bool: Some(true),
-//                         ..Default::default()
-//                     },
-//                     AttributeValue {
-//                         s: Some("String Value".to_string()),
-//                         ..Default::default()
-//                     },
-//                 ]
-//                 .into_iter()
-//                 .collect(),
-//             ),
-//             ..Default::default()
-//         };
-//         assert_eq!(build_attribute_value(&value), expected);
-//     }
-// }
+        let expected = AttributeValue::L(
+            vec![
+                AttributeValue::Bool(true),
+                AttributeValue::S("String Value".to_string()),
+            ]
+            .into_iter()
+            .collect(),
+        );
+        assert_eq!(build_attribute_value(&value), expected);
+    }
+}
