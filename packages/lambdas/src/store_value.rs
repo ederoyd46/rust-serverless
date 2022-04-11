@@ -10,8 +10,8 @@ use log::{error, info};
 #[tokio::main]
 async fn main() -> Result<(), Error> {
     lambdas::initialise_logger()?;
+    info!("Initialise Store Value");
 
-    info!("Running Main");
     let config = ConfigBuilder::new()
         .table_name(lambdas::get_table_name())
         .build()
@@ -35,6 +35,5 @@ async fn main() -> Result<(), Error> {
     }))
     .await?;
 
-    info!("Finished Main");
     Ok(())
 }
