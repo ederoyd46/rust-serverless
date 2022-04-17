@@ -1,14 +1,14 @@
-use lambda_http::{service_fn, Body, Request};
+use lambda_http::{service_fn, tower::BoxError, Body, Request};
 
 use serde_json::Value;
 
 use lib::error_and_panic;
-use lib::types::{ConfigBuilder, CustomValue, Error};
+use lib::types::{ConfigBuilder, CustomValue};
 
 use log::{error, info};
 
 #[tokio::main]
-async fn main() -> Result<(), Error> {
+async fn main() -> Result<(), BoxError> {
     lambdas::initialise_logger()?;
     info!("Initialise Store Value");
 
@@ -18,7 +18,6 @@ async fn main() -> Result<(), Error> {
         .await;
 
     lambda_http::run(service_fn(|event: Request| {
-        // info!("Event {:?}", event);
         let body = match event.body() {
             Body::Text(val) => val.as_ref(),
             Body::Binary(val) => std::str::from_utf8(val).unwrap(),

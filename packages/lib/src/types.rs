@@ -18,5 +18,3 @@ pub trait Storable: Send + Sync {
 pub trait Retrievable<T>: Send + Sync {
     fn from_dynamo_db(data: HashMap<String, AttributeValue>) -> Option<T>;
 }
-
-pub type Error = Box<dyn std::error::Error + Send + Sync + 'static>;

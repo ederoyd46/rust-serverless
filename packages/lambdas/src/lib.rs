@@ -1,7 +1,7 @@
-use lambda_http::Request;
+use lambda_http::{tower::BoxError, Request};
 use lib::database::{retrieve_database_item, store_database_item};
 use lib::error_and_panic;
-use lib::types::{Config, CustomRetrieveValue, CustomValue, Error, Retrievable, Storable};
+use lib::types::{Config, CustomRetrieveValue, CustomValue, Retrievable, Storable};
 use log::{debug, error, info, LevelFilter, SetLoggerError};
 use serde_json::Value;
 use std::env;
@@ -23,14 +23,14 @@ pub fn get_table_name() -> String {
     }
 }
 
-pub async fn retrieve_handler(config: &Config, key: CustomRetrieveValue) -> Result<Value, Error> {
+pub async fn retrieve_handler(config: &Config, key: CustomRetrieveValue) -> Result<Value, BoxError> {
     let item_from_dynamo =
         retrieve_database_item(&config.table_name, &key, &config.dynamodb).await?;
     let retrieved_item = CustomValue::from_dynamo_db(item_from_dynamo.item.unwrap()).unwrap();
     Ok(retrieved_item.value().to_owned())
 }
 
-pub async fn store_handler<T: Storable>(config: &Config, data: T) -> Result<String, Error> {
+pub async fn store_handler<T: Storable>(config: &Config, data: T) -> Result<String, BoxError> {
     if !data.is_valid() {
         error_and_panic!("No key specified");
     }

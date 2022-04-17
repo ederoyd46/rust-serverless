@@ -1,10 +1,10 @@
-use lib::types::{ConfigBuilder, CustomRetrieveValue, Error};
+use lib::types::{ConfigBuilder, CustomRetrieveValue};
 
-use lambda_http::service_fn;
+use lambda_http::{service_fn, tower::BoxError};
 use log::info;
 
 #[tokio::main]
-async fn main() -> Result<(), Error> {
+async fn main() -> Result<(), BoxError> {
     lambdas::initialise_logger()?;
     info!("Initialise Retrieve Value");
 
