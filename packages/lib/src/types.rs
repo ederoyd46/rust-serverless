@@ -1,10 +1,12 @@
 mod config;
 mod custom_retrieve_value;
 mod custom_value;
+mod error;
 
 pub use config::*;
 pub use custom_retrieve_value::CustomRetrieveValue;
 pub use custom_value::CustomValue;
+pub use error::AppError;
 
 use aws_sdk_dynamodb::model::AttributeValue;
 use std::collections::HashMap;

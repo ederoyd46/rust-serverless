@@ -15,7 +15,10 @@ macro_rules! error_and_panic {
 macro_rules! log_and_throw {
     ($message:expr) => {{
         error!("{}", $message);
-        return Err($message);
+        return Err(AppError {
+            kind: "Application",
+            message: $message,
+        });
     }};
 
     ($message:expr, $error:expr) => {{
