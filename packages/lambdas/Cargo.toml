@@ -5,7 +5,7 @@ name = "lambdas"
 version = "0.4.0"
 
 [dependencies]
-lambda_http = "0.5.1"
+lambda_http = "0.5.2"
 lib = { path = "../lib" }
 log = "^0.4.14"
 tokio = { version = "1", features = ["macros"] }
