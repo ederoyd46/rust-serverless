@@ -3,3 +3,4 @@ members = [
     "packages/lambdas",
     "packages/lib"
 ]
+resolver = "2"
